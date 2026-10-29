@@ -1,0 +1,9 @@
+{
+  "package": "com.rafi.antireelai",
+  "version": "versionName=1.0.22",
+  "restricted_access": "ACCESS_RESTRICTED_SETTINGS: default",
+  "accessibility_enabled": true,
+  "test_only_build": false,
+  "status": "Android accessibility is enabled; verify service connection in AntiReel Settings > Accessibility.",
+  "note": "Read-only check. No permissions, security settings, app data or installer identity were changed."
+}

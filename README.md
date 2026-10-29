@@ -54,6 +54,6 @@ The intended GitHub repository is `bodiujjamanrafi/AntiReel-AI`, private. **Remo
 
 ## Verification boundaries
 
-Unit/build/static tests are not a physical-device compatibility certification. This release has no connected-phone validation; accessibility approval, denial paths, live Miso/counting/statistics, notification behavior and the earlier 30-consecutive-Short check still require a real device. Check the compliance report before submitting to Google Play.
+Unit/build/static tests are not a physical-device compatibility certification. This update was installed on the matching Pixel 6 Pro without a reset. Eleven phone checks passed, including consent/decline, legacy-consent migration, legal/support intents, snapshot safeguards, Settings navigation and all four legal readers in light/dark at large font scale. Real tracking under the revised disclosure requires the owner’s renewed consent; continuous live counting, notification scenarios and the earlier 30-consecutive-Short check remain pending. Check the compliance report before submitting to Google Play.
 
 Support: **hello@imrafi.com**. Security reports use the same address; do not attach credentials, private keys or unrelated private screen content.

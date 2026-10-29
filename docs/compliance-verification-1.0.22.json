@@ -43,9 +43,9 @@
     "findings": [],
     "limits": "Public Maven coordinates only; no APK/user data sent. Coverage is incomplete. Zero matches are not malware-free certification."
   },
-  "physical_tests_executed": 0,
+  "physical_tests_executed": 11,
   "physical_30_shorts_verified": false,
-  "device_blocker": "No ADB devices connected",
+  "device_blocker": null,
   "cloudflare_changes_made": false,
   "public_legal_urls_verified": false,
   "github_remote_created": false,
@@ -54,5 +54,17 @@
   "github_blocker": "gh CLI unauthenticated; no connected GitHub/browser API",
   "root_git_blocker": "Root .git writes prohibited; clean source snapshot prepared separately under /tmp",
   "legal_review_required": true,
-  "store_approval_guaranteed": false
+  "store_approval_guaranteed": false,
+  "physical_test_classes": {
+    "LegalConsentTest": 3,
+    "AccessibilityPrivacyTest": 6,
+    "SettingsRoutingTest": 1,
+    "LegalReaderTest": 1
+  },
+  "legal_reader_theme_font_states": 8,
+  "installed_on_device": true,
+  "test_device": "Pixel 6 Pro / API 37",
+  "live_tracking_verified": false,
+  "live_tracking_note": "Owner must affirm the revised disclosure; continuous counting / 30-Short flow not verified.",
+  "device_accessibility_enabled": true
 }
