@@ -43,7 +43,7 @@
     "findings": [],
     "limits": "Public Maven coordinates only; no APK/user data sent. Coverage is incomplete. Zero matches are not malware-free certification."
   },
-  "physical_tests_executed": 11,
+  "physical_tests_executed": 12,
   "physical_30_shorts_verified": false,
   "device_blocker": null,
   "cloudflare_changes_made": false,
@@ -59,7 +59,8 @@
     "LegalConsentTest": 3,
     "AccessibilityPrivacyTest": 6,
     "SettingsRoutingTest": 1,
-    "LegalReaderTest": 1
+    "LegalReaderTest": 1,
+    "LegalSettingsRoutingTest": 1
   },
   "legal_reader_theme_font_states": 8,
   "installed_on_device": true,
