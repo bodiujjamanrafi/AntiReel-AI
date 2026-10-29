@@ -46,11 +46,15 @@ Tracking requires the current versioned in-app accessibility disclosure/affirmat
 
 Local activity can be deleted with confirmation in Settings → Activity & storage. All profile/draft/preferences can be removed using Android App info → Storage & cache → Clear storage. No AntiReel account or remote activity store exists. The privacy policy explains speech-engine, external browser, voluntary support email and diagnostic exceptions.
 
-## Legal pages and private backup
+## Legal pages and source backup
 
 The fixed legal destinations are `https://legal.imrafi.bond/privacy`, `/terms`, `/security` and `/support`. **They are configured but not deployed/verified yet.** Settings includes the same complete offline documents and safe browser/email actions. Build the static files with `python3 legal-site/build.py`; review `legal-site/DEPLOYMENT.md` before any Cloudflare/DNS change.
 
-The intended GitHub repository is `bodiujjamanrafi/AntiReel-AI`, private. **Remote creation/push is pending authenticated access.** Follow `docs/GITHUB_SETUP.md`; do not upload signing credentials. No unrelated DNS, VPS or website changes are part of this project.
+The requested GitHub repository is `bodiujjamanrafi/AntiReel-AI`, public. **Remote creation/push is pending authenticated access.** The older private-only publishing helper is retained for reference; it must not be used for the new public publishing request. Never upload signing credentials. No unrelated DNS, VPS or website changes are part of this project.
+
+## Vercel legal-site hosting
+
+The root `vercel.json` builds only the static legal/support documents using Python and serves `legal-site/dist` with clean URLs and the existing security headers. Import this repository as an Other framework project with its root directory unchanged. The Android application does not run in Vercel. Hosting remains pending authenticated deployment and live verification; no custom-domain or DNS change is included. Existing in-app canonical URLs remain unchanged until the custom host is deployed.
 
 ## Verification boundaries
 

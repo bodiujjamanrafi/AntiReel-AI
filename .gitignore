@@ -13,6 +13,10 @@ local.properties
 /dist/
 /legal-site/dist/
 /generated_images/
+/app/release/
+*.apk
+*.aab
+*.mapping
 # Credentials and signing material (never commit)
 .signing/
 antireel-signing.properties
@@ -36,3 +40,6 @@ node_modules/
 .playwright/
 *.log
 /captures/
+
+# Local Vercel account and project state
+.vercel/
