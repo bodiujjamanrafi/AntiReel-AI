@@ -1,0 +1,24 @@
+# Secrets and credentials (never upload to deployment)
+.signing/
+antireel-signing.properties
+Untitled.jks
+local.properties
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+.env*
+
+# Local build artifacts and caches
+dist/
+build/
+app/build/
+app/release/
+.gradle/
+.idea/
+.kotlin/
+captures/
+generated_images/
+.DS_Store
