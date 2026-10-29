@@ -1,0 +1,25 @@
+{
+  "version": "1.0.21",
+  "unit_tests": 154,
+  "failures": 0,
+  "errors": 0,
+  "python_tests": 10,
+  "lint_errors": 0,
+  "lint_warnings": 81,
+  "instrumentation_apk_compiled": true,
+  "physical_tests_executed": 0,
+  "physical_30_shorts_verified": false,
+  "installed_on_device": false,
+  "device_blocker": "adb devices and mdns returned no connected devices",
+  "unchanged_previous_main_files": 104,
+  "changed_existing_main_files": [
+    "app/src/main/java/com/rafi/antireelai/tracking/ReelAccessibilityService.kt",
+    "app/src/main/java/com/rafi/antireelai/tracking/ReelNodeSnapshot.kt",
+    "app/src/main/java/com/rafi/antireelai/tracking/ReelRecognition.kt"
+  ],
+  "new_main_files": [
+    "app/src/main/java/com/rafi/antireelai/tracking/YouTubeShortsTracker.kt",
+    "app/src/main/java/com/rafi/antireelai/tracking/YouTubeShortsRecognition.kt"
+  ],
+  "note": "Synthetic tests are not a device accuracy certification; see YOUTUBE_SHORTS_1.0.21.md."
+}

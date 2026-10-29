@@ -1,0 +1,38 @@
+# Android / Gradle / IDE output
+.gradle/
+.kotlin/
+.idea/
+*.iml
+**/build/
+.externalNativeBuild/
+.cxx/
+captures/
+local.properties
+.DS_Store
+# Generated distribution and website output
+/dist/
+/legal-site/dist/
+/generated_images/
+# Credentials and signing material (never commit)
+.signing/
+antireel-signing.properties
+.env
+.env.*
+!.env.example
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
+# Tool caches and local diagnostic captures
+__pycache__/
+*.py[cod]
+.venv/
+node_modules/
+.wrangler/
+.playwright/
+*.log
+/captures/

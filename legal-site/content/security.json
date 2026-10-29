@@ -1,0 +1,56 @@
+{
+  "updated": "29 October 2026",
+  "app": "AntiReel AI",
+  "contact": "hello@imrafi.com",
+  "base_url": "https://legal.imrafi.bond",
+  "slug": "security",
+  "title": "Security & Permissions",
+  "summary": "What Android access enables, why it is requested, and how to turn it off.",
+  "sections": [
+    {
+      "title": "Accessibility Service",
+      "paragraphs": [
+        "Android guards the service with BIND_ACCESSIBILITY_SERVICE; only the system can bind it. You must give affirmative in-app consent and separately enable AntiReel in Android Accessibility settings. It inspects selected apps’ visible accessibility content/events to detect players for counting and timing, draws a TYPE_ACCESSIBILITY_OVERLAY, and performs the disclosed limit response. It is not declared as a disability accessibility tool. The optional Android accessibility shortcut is not the service permission itself.",
+        "Manage access in Android Settings → Accessibility → Installed/Downloaded apps → AntiReel AI. Names vary by device. Turning off Use AntiReel stops accessibility-based tracking. You can also pause in AntiReel. The app cannot approve access for you or change Android’s protection decisions."
+      ]
+    },
+    {
+      "title": "Overlay and package visibility",
+      "paragraphs": [
+        "Miso uses an accessibility overlay provided to the approved service. The app does not request the separate SYSTEM_ALERT_WINDOW / Display over other apps permission. Android package queries are limited to the supported social apps and speech engines to show installation/open actions; the app does not request QUERY_ALL_PACKAGES."
+      ]
+    },
+    {
+      "title": "Notifications, vibration and reboot",
+      "paragraphs": [
+        "POST_NOTIFICATIONS is requested on Android 13+ for break reminders and daily-limit notifications. Declining it does not grant access or prevent other local app use; notifications may be unavailable. Manage it in Android App info → Notifications. Sound also follows notification-channel, volume and Do Not Disturb settings.",
+        "VIBRATE supports optional button feedback and reminder vibration. It is not access to your microphone or sensors. RECEIVE_BOOT_COMPLETED reschedules an already configured break timer after reboot; it does not silently approve accessibility. Break alarms are inexact and may be delayed by Doze or battery restrictions. The app does not request exact-alarm permission or start a general foreground service."
+      ]
+    },
+    {
+      "title": "Permissions the app does not request",
+      "paragraphs": [
+        "No Internet, camera, microphone, contacts, location, SMS, phone, shared-storage, install-packages, broad installed-app visibility or generic draw-over-other-apps permission is declared. External browser, email and installed text-to-speech services have their own permissions and policies."
+      ]
+    },
+    {
+      "title": "Storage and safeguards",
+      "paragraphs": [
+        "Preferences/history are kept in app-private Android storage. Backups and device-transfer exports are excluded. This is not additional application-level encryption. Release signing verifies update identity; it is not malware certification. Screen text is transient and excluded from tracking diagnostics. Delete activity in AntiReel or clear all storage through Android App info."
+      ]
+    },
+    {
+      "title": "Restricted settings and safe troubleshooting",
+      "paragraphs": [
+        "Keep Play Protect and Android security controls enabled. If Android restricts accessibility or blocks installation, use the official Android/device help and report the exact warning to support. A restricted-setting approval, if Android explicitly offers it and you trust the source, is a user-managed Android decision; do not disable Play Protect, root the device, spoof installer identity or install modified APKs.",
+        "Use an APK signed with the same certificate as your existing installation. A signing mismatch can cause App not installed. Do not uninstall merely to force an update if you need to retain local data. The supported minimum is Android 11; OEM policies and hardware support vary."
+      ]
+    },
+    {
+      "title": "Report a security concern",
+      "paragraphs": [
+        "Email hello@imrafi.com with a concise description, affected version and reproduction steps. Share only necessary information. Do not send credentials, private signing keys, unrelated screen content or proof involving other people’s data. No guaranteed response time or bug-bounty arrangement is promised."
+      ]
+    }
+  ]
+}

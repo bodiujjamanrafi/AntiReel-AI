@@ -1,0 +1,59 @@
+{
+  "updated": "29 October 2026",
+  "app": "AntiReel AI",
+  "contact": "hello@imrafi.com",
+  "base_url": "https://legal.imrafi.bond",
+  "slug": "support",
+  "title": "Help & Support",
+  "summary": "Set up Miso, understand your activity, and get help without sharing more than necessary.",
+  "sections": [
+    {
+      "title": "Activate Miso",
+      "paragraphs": [
+        "1. Choose supported apps in Platforms. 2. Open Miso or tap Start. Read the setup guide and separate accessibility disclosure. Choose I agree · open Settings only if you consent. 3. In Android Accessibility, find AntiReel AI under Installed/Downloaded apps and enable Use AntiReel. Confirm Android’s notice. 4. Return to AntiReel to check Connected. The AI/accessibility shortcut is optional; it is not a substitute for enabling the service. Device labels vary. Decline/Back never grants consent."
+      ]
+    },
+    {
+      "title": "Count not moving",
+      "paragraphs": [
+        "Confirm the platform is selected, Miso is started, no break is active, and accessibility is connected. Open the actual full-screen Reels/Shorts player rather than a Home feed tile. Ads, recognized repeats and backward navigation may be excluded. If a daily reel or time boundary was reached, counting stops intentionally. YouTube may not expose enough metadata for exact detection; an event alone is not counted as a video."
+      ]
+    },
+    {
+      "title": "YouTube Shorts and repeat detection",
+      "paragraphs": [
+        "YouTube uses recycled player views and variable accessibility events. AntiReel pairs confirmed player transitions with settled video identity and rejects known repeats; ambiguous, hidden or too-brief metadata can still cause missed detections. Backward navigation to an unseen video may be ambiguous when direction is not exposed. Repeat history is bounded and temporary, not a permanent watched-video database."
+      ]
+    },
+    {
+      "title": "Daily limits, restart and breaks",
+      "paragraphs": [
+        "Daily reel and optional time limits apply independently; reaching either triggers the disclosed limit response. Restart allowance adds 50 reels once per day when eligible, but does not remove a time cap or erase activity. Breaks show a timer and can notify when finished. Android battery restrictions can delay reminders. You can pause Miso or change supported preferences."
+      ]
+    },
+    {
+      "title": "No voice or notification sound",
+      "paragraphs": [
+        "Install an offline voice for English/Bengali in Android text-to-speech settings and check AntiReel’s voice preferences and media volume. Missing offline speech does not prevent visual controls. Allow app notifications and enable the relevant notification channel/sound; check Do Not Disturb and battery settings. The app cannot override these controls."
+      ]
+    },
+    {
+      "title": "Activity and deletion",
+      "paragraphs": [
+        "Activity shows recognized foreground video-screen durations, daily reel estimates and each selected platform’s share of recorded time. It is not Android’s full-device Digital Wellbeing history or a measure of attention. Delete activity from Settings → Activity & storage; confirm only when you want to remove local counts and durations. To remove all profile/drafts/preferences, use Android App info → Storage & cache → Clear storage or uninstall."
+      ]
+    },
+    {
+      "title": "Install or accessibility blocked",
+      "paragraphs": [
+        "Use a trusted release and keep Play Protect on. Android may restrict settings on sideloaded apps or reject an APK with a different signing key, incompatible Android version or damaged download. Do not disable device security or erase app data to troubleshoot. Send the exact warning and version to support. No app can guarantee permission approval on every device."
+      ]
+    },
+    {
+      "title": "Contact and bug reports",
+      "paragraphs": [
+        "Email hello@imrafi.com. Include AntiReel version, Android version, device model, affected platform/version and simple reproduction steps. Say whether access is connected and a limit/break is active. Do not include passwords, tokens, signing keys or unrelated private screen content. Attach a redacted image only if you choose. Opening the support action creates an email draft; you choose whether to send it. No activity is attached automatically."
+      ]
+    }
+  ]
+}

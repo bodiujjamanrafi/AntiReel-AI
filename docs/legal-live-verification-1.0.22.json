@@ -1,0 +1,30 @@
+{
+  "all_verified": false,
+  "pages": [
+    {
+      "url": "https://legal.imrafi.bond/privacy",
+      "verified": false,
+      "tls_certificate_verified": false,
+      "error": "URLError: <urlopen error timed out>"
+    },
+    {
+      "url": "https://legal.imrafi.bond/terms",
+      "verified": false,
+      "tls_certificate_verified": false,
+      "error": "URLError: <urlopen error [Errno 54] Connection reset by peer>"
+    },
+    {
+      "url": "https://legal.imrafi.bond/security",
+      "verified": false,
+      "tls_certificate_verified": false,
+      "error": "URLError: <urlopen error timed out>"
+    },
+    {
+      "url": "https://legal.imrafi.bond/support",
+      "verified": false,
+      "tls_certificate_verified": false,
+      "error": "URLError: <urlopen error [Errno 54] Connection reset by peer>"
+    }
+  ],
+  "note": "HTTPS uses default certificate/hostname validation. This does not prove worldwide availability or Google Play approval."
+}

@@ -1,0 +1,74 @@
+{
+  "updated": "29 October 2026",
+  "app": "AntiReel AI",
+  "contact": "hello@imrafi.com",
+  "base_url": "https://legal.imrafi.bond",
+  "slug": "privacy",
+  "title": "Privacy Policy",
+  "summary": "Your scrolling boundaries stay on your phone. Here is exactly what AntiReel accesses and stores.",
+  "sections": [
+    {
+      "title": "Who this policy covers",
+      "paragraphs": [
+        "This policy covers the AntiReel AI Android application and its legal/support pages. The AntiReel AI developer can be contacted at hello@imrafi.com. AntiReel is a personal digital-wellbeing aid, not a disability accessibility tool or parental-control service."
+      ]
+    },
+    {
+      "title": "Information you enter",
+      "paragraphs": [
+        "Your name or nickname, language, selected platforms, daily reel/time limits, reminder preferences, and onboarding answers/drafts are stored in the app’s private local preferences. Older onboarding drafts may retain answers from earlier versions until you clear app data. You do not create an AntiReel account."
+      ]
+    },
+    {
+      "title": "Accessibility access and Miso",
+      "paragraphs": [
+        "Only after in-app consent and Android approval, while tracking is running, AntiReel reads visible accessibility labels/content, video metadata, page/scroll events and foreground app information in your selected supported platforms. Accessibility windows are inspected to locate the current foreground application; content snapshots are restricted to selected supported apps. Editable fields, passwords and hidden nodes are excluded from content inspection. These safeguards are not a guarantee about every third-party app’s accessibility labeling. Other visible text in a selected app may be encountered while checking for a short-video player; it is processed transiently and not saved as content or sent to the developer.",
+        "This information is processed on your device to recognize short-video players, estimate newly viewed reels and time, reject recognized repeats/ads, and display Miso and the counter. At your chosen limit, the app requests media pause, returns to Home and displays a warning. You can pause Miso, decline setup, or disable accessibility in Android Settings. Home, Back and uninstall remain available."
+      ]
+    },
+    {
+      "title": "What is saved and for how long",
+      "paragraphs": [
+        "Daily per-platform reel counts and recognized foreground video-screen durations, selected apps, settings, local profile/drafts, connection/status codes, break deadlines, consent version, reminder state and the daily restart allowance are saved locally. These estimates are not a record of exact attention or playback.",
+        "Activity older than the most recent 30 calendar days is pruned on subsequent tracking writes, at most once per day. If you stop tracking, old entries may remain until a later tracking write or deletion. Profile, drafts and preferences remain until changed or app data is cleared. Video identity hashes used for repeat detection are held only in bounded memory and disappear on process/service recreation or a local-day reset; they are not written to history."
+      ]
+    },
+    {
+      "title": "Screen content and diagnostics",
+      "paragraphs": [
+        "Tracking does not save screenshots, screen recordings, videos, raw screen labels, captions or video identifiers, and does not upload them. No microphone or camera is used. The included setup demonstration is bundled example media, not a live recording of your phone.",
+        "Optional Android diagnostics, enabled explicitly using a developer log tag, contain numeric scroll fields, transition generations and reason/count states, not captions, creators, video URLs or identity hashes. The app does not upload these logs. Android’s diagnostic buffer and any manual export are controlled by Android and the person enabling or exporting them."
+      ]
+    },
+    {
+      "title": "Network, speech and other services",
+      "paragraphs": [
+        "The Android app has no Internet permission, account server, ads, analytics SDK or automatic crash-reporting SDK. It does not automatically send activity, profile or usage records to the developer.",
+        "Miso sends speech text to your selected installed Android text-to-speech engine, choosing voices reported as installed and not requiring a network connection. Speech can include app guidance or a name you entered. The engine is a separate Android service; its implementation and privacy practices are controlled by its provider. You can mute speech in AntiReel. Offline voice selection is not a certification of a third-party engine.",
+        "Opening legal links launches your browser with a fixed URL and no profile or tracking parameters. The browser and hosting provider necessarily process ordinary request information such as IP address, browser headers and requested path. These static pages add no analytics scripts, tracking pixels, web forms or cookies of their own. Hosting/security-provider processing depends on the final hosting configuration; no fixed provider-log retention period is promised.",
+        "Contact support opens your email app. Nothing is sent automatically. If you send an email, we receive your email address and whatever message/attachments you choose to include; the email providers process that correspondence. Do not send passwords, permission-screen secrets or unrelated private content. Support messages are used to answer and troubleshoot your request, not for advertising. Contact hello@imrafi.com to ask about or request deletion of correspondence; retention may depend on resolving the request and applicable legal obligations."
+      ]
+    },
+    {
+      "title": "Sharing and sale",
+      "paragraphs": [
+        "AntiReel does not sell personal information or automatically share local activity with advertisers or analytics companies. Browser, email and Android speech operations described above use the services you choose. Information you voluntarily send to support may be processed by email/service providers and disclosed where legally required. There is no automatic upload of your local activity database."
+      ]
+    },
+    {
+      "title": "Delete data and manage access",
+      "paragraphs": [
+        "Settings → Activity & storage → Delete activity history removes local daily counts, recorded durations and reminder-history flags after confirmation, while preserving your profile, settings, selected apps and restart state. For all local profile/drafts/preferences, use Android App info → Storage & cache → Clear storage, or uninstall the app. Android backup/device-transfer exclusion is configured; copies you create independently are outside the app’s control.",
+        "You can correct your language/preferences, change goals, mute speech, disable notifications, pause Miso or revoke accessibility at any time. We cannot remotely access or delete local app data because there is no AntiReel account or remote activity store. For applicable privacy rights or support correspondence requests, contact hello@imrafi.com. Rights and obligations depend on your location."
+      ]
+    },
+    {
+      "title": "Security, children and changes",
+      "paragraphs": [
+        "App-private Android storage, explicit permission gates, disabled cleartext traffic and backup exclusions reduce exposure, but no system is perfectly secure. The app does not add its own database encryption. Android device security remains important.",
+        "AntiReel is not designed to collect children’s information on a server. Children should use it only with appropriate adult involvement and any legally required consent. No age verification or parental account is implemented.",
+        "We may update this policy when the app or data practices change. The date above identifies this version. Material changes to accessibility data use require renewed in-app consent before that use."
+      ]
+    }
+  ]
+}

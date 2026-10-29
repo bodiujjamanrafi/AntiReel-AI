@@ -1,0 +1,54 @@
+{
+  "updated": "29 October 2026",
+  "app": "AntiReel AI",
+  "contact": "hello@imrafi.com",
+  "base_url": "https://legal.imrafi.bond",
+  "slug": "terms",
+  "title": "Terms of Service",
+  "summary": "Clear boundaries, realistic expectations, and control that stays with you.",
+  "sections": [
+    {
+      "title": "Using AntiReel",
+      "paragraphs": [
+        "AntiReel AI is provided as a personal tool to help you manage short-video habits. Use it only if you can legally agree to these terms, or with the permission required by applicable law. Contact the developer at hello@imrafi.com. By choosing to use the app you agree to these terms; accessibility access remains a separate, optional consent and Android permission."
+      ]
+    },
+    {
+      "title": "Your choices and permissions",
+      "paragraphs": [
+        "You choose supported platforms, daily goals, reminders and whether Miso is active. Accessibility approval is optional and can be revoked in Android Settings. Features relying on access will not operate without it. Do not use AntiReel to monitor someone else without their permission, evade security controls, or violate applicable law or a platform’s terms."
+      ]
+    },
+    {
+      "title": "Limits and intervention",
+      "paragraphs": [
+        "At the daily reel or time boundary, the app may show a red warning, speak, request media pause, return to Home and display its own warning screen. The once-per-day restart allowance adds 50 reels when eligible; an existing time cap still applies. These are deterministic responses to your configured settings, not autonomous decision-making. Home, Back, pause, permission revocation and uninstall remain available."
+      ]
+    },
+    {
+      "title": "Accuracy and availability",
+      "paragraphs": [
+        "Counts and tracked durations are estimates based on accessibility signals, not a guarantee of actual attention, exact playback or universal blocking. Social-app updates, recycled views, missing metadata, repeated captions, rapid navigation, Android/OEM restrictions, notification permissions, offline voices and battery settings may affect results. YouTube transitions without sufficient accessible identity/direction cannot always be identified exactly. Do not rely on the app for safety-critical, medical or emergency purposes."
+      ]
+    },
+    {
+      "title": "Your information and support",
+      "paragraphs": [
+        "The Privacy Policy explains local storage, permissions, speech, browser links and voluntary support email. You remain responsible for information you choose to send. There is no cloud backup or account recovery for local activity. Clearing storage or uninstalling can permanently remove it. No response-time or service-availability guarantee is offered."
+      ]
+    },
+    {
+      "title": "Third-party platforms and ownership",
+      "paragraphs": [
+        "AntiReel is not affiliated with or endorsed by YouTube, Instagram, Facebook, TikTok or the other supported services. Their names and logos identify interoperability and remain their owners’ property. The app and Miso materials are subject to their applicable intellectual-property rights; these terms do not transfer ownership."
+      ]
+    },
+    {
+      "title": "Legal rights and changes",
+      "paragraphs": [
+        "To the extent permitted by applicable law, the app is provided as available without a promise of uninterrupted operation, exact counting or fitness for a particular purpose. Nothing in these terms excludes mandatory consumer rights, liability or remedies that cannot legally be excluded. Applicable mandatory law and competent courts determine rights and disputes; no exclusive governing-law clause is asserted in this version.",
+        "The developer may update the app and these terms. Material changes will be identified with an updated date and, where required, additional notice or consent. If you stop using the app, you can disable accessibility and uninstall it. Questions: hello@imrafi.com."
+      ]
+    }
+  ]
+}

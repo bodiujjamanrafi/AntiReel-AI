@@ -1,0 +1,29 @@
+{
+  "duration_seconds": 13.5,
+  "dimensions": [
+    720,
+    1280
+  ],
+  "fps": 24,
+  "steps": 3,
+  "tap_demonstrations": 3,
+  "automatic_loop": false,
+  "added_mascots": 0,
+  "screens": [
+    {
+      "source": "image(20261028-045201).png",
+      "role": "find",
+      "sha256": "e0cbbc84e1cd341c8f0c1b5b6a5668c9821429c1c0344ab4b3d94fabcba3fd11"
+    },
+    {
+      "source": "image(20261028-045210).png",
+      "role": "allow",
+      "sha256": "988339c337e08dd92e66d608cdc81711bd620eacea58e63cdf1d09f31c67e19e"
+    },
+    {
+      "source": "image(20261028-045219).png",
+      "role": "shortcut",
+      "sha256": "9007671742e42310fae60b7653be7fc75b20d76567c9d8e61ae981b77b2ed3e2"
+    }
+  ]
+}

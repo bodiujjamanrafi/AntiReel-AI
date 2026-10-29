@@ -1,0 +1,15 @@
+gradle.projectsEvaluated {
+    def app = gradle.rootProject.project(':app')
+    app.tasks.register('exportAuditDependencies') {
+        doLast {
+            def entries = app.configurations.releaseRuntimeClasspath.incoming.resolutionResult.allComponents
+                .collect { it.moduleVersion }
+                .findAll { it != null && it.group != '' }
+                .collect { [name: "${it.group}:${it.name}".toString(), version: it.version] }
+                .unique().sort { a,b -> a.name <=> b.name }
+            def out = new File(app.rootProject.projectDir, 'docs/release-dependencies.json')
+            out.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(entries)) + '\n'
+            println "Exported ${entries.size()} public Maven dependency coordinates."
+        }
+    }
+}

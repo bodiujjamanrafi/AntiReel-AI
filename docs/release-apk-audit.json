@@ -1,0 +1,89 @@
+{
+  "apk": "/Users/rafijr/Desktop/island/app/build/outputs/apk/release/app-release.apk",
+  "sha256": "98d65d85e5128ec3a13f62ce0da9e708f3bf12ee4c57a9cd9e5a7eb9955b3662",
+  "size_bytes": 5528957,
+  "version_name": "1.0.22",
+  "version_code": "23",
+  "min_sdk": "30",
+  "target_sdk": "37",
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86",
+    "x86_64"
+  ],
+  "elf64_load_alignments": {
+    "lib/arm64-v8a/libandroidx.graphics.path.so": [
+      16384,
+      16384,
+      16384
+    ],
+    "lib/x86_64/libandroidx.graphics.path.so": [
+      16384,
+      16384,
+      16384
+    ]
+  },
+  "checks": {
+    "release_not_debuggable": true,
+    "release_not_test_only": true,
+    "backup_disabled": true,
+    "cleartext_disabled": true,
+    "only_expected_permissions": true,
+    "no_packaged_instrumentation": true,
+    "no_required_hardware_features": true,
+    "no_internet_permission": true,
+    "exported_components_guarded": true,
+    "accessibility_scoped": true,
+    "accessibility_scope_matches_declared_platforms": true,
+    "no_unneeded_accessibility_control_capabilities": true,
+    "no_input_text_accessibility_events": true,
+    "explicit_cloud_and_device_backup_exclusions": true,
+    "not_misrepresented_as_disability_tool": true,
+    "signature_verified": true,
+    "not_debug_certificate": true,
+    "zip_aligned_16kb": true,
+    "apk_zip_integrity": true,
+    "no_packaged_credentials": true,
+    "elf64_load_alignment_16kb": true,
+    "native_abis_complete": true
+  },
+  "permissions": [
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.VIBRATE",
+    "com.rafi.antireelai.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+  ],
+  "exported_components": [
+    {
+      "type": "activity",
+      "theme": "@0x7f0b0009",
+      "label": "@0x7f0a0004",
+      "name": "com.rafi.antireelai.MainActivity",
+      "exported": "true",
+      "windowSoftInputMode": "0x00000010"
+    },
+    {
+      "type": "service",
+      "name": "com.rafi.antireelai.tracking.ReelAccessibilityService",
+      "permission": "android.permission.BIND_ACCESSIBILITY_SERVICE",
+      "exported": "true"
+    },
+    {
+      "type": "receiver",
+      "name": "androidx.profileinstaller.ProfileInstallReceiver",
+      "permission": "android.permission.DUMP",
+      "enabled": "true",
+      "exported": "true",
+      "directBootAware": "false"
+    }
+  ],
+  "native_libraries": [
+    "lib/arm64-v8a/libandroidx.graphics.path.so",
+    "lib/armeabi-v7a/libandroidx.graphics.path.so",
+    "lib/x86/libandroidx.graphics.path.so",
+    "lib/x86_64/libandroidx.graphics.path.so"
+  ],
+  "signature_verification": "WARNING: A restricted method in java.lang.System has been called\nWARNING: java.lang.System::loadLibrary has been called by org.conscrypt.NativeLibraryUtil in an unnamed module (file:/Users/rafijr/Library/Android/sdk/build-tools/37.0.0/lib/apksigner.jar)\nWARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module\nWARNING: Restricted methods will be blocked in a future release unless native access is enabled\n\nVerifies\nVerified using v1 scheme (JAR signing): false\nVerified using v2 scheme (APK Signature Scheme v2): false\nVerified using v3 scheme (APK Signature Scheme v3): true\nVerified using v3.1 scheme (APK Signature Scheme v3.1): false\nVerified using v3.2 scheme (APK Signature Scheme v3.2): false\nVerified using v4 scheme (APK Signature Scheme v4): false\nVerified for SourceStamp: false\nNumber of signers: 1\nV3.0 Signer: certificate DN: CN=AntiReel AI, O=AntiReel, C=BD\nV3.0 Signer: certificate SHA-256 digest: 0f507ded36b9d99db671ac730ad1199d9f0c782cd8f06b2a06b03d9b9f246d7c\nV3.0 Signer: certificate SHA-1 digest: 0a163194fc363973b721d5cb510b1ab5d0b480f4\nV3.0 Signer: certificate MD5 digest: a2d3f96df713d0bdf8288fa04631bbd2\nV3.0 Signer: key algorithm: RSA\nV3.0 Signer: key size (bits): 3072\nV3.0 Signer: public key SHA-256 digest: e0c96e45bbdc434f3a5e2a3041e1b2d85a4e4b70048ca74e06e9c2227d43c9d8\nV3.0 Signer: public key SHA-1 digest: 4236b721b8f391cab1b422a9c37523256f9a39fd\nV3.0 Signer: public key MD5 digest: de0c936eaaa25ac9adecd7b99c8f9585\n",
+  "limits": "Local configuration and signature review only. Not a malware scan, dependency CVE certification, Google review, or Play Protect approval."
+}

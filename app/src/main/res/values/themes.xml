@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AntiReelAI" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowBackground">#F1EDF5</item>
+        <item name="android:colorAccent">#86153E</item>
+        <item name="android:navigationBarColor">#F1EDF5</item>
+    </style>
+</resources>

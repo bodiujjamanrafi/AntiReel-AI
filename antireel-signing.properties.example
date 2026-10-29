@@ -1,0 +1,6 @@
+# Copy to antireel-signing.properties locally; never commit the filled file.
+# Use your EXISTING private release key; do not regenerate it for an update.
+storeFile=/absolute/path/outside/the/repository/antireel-release.jks
+storePassword=REPLACE_LOCALLY
+keyAlias=REPLACE_LOCALLY
+keyPassword=REPLACE_LOCALLY

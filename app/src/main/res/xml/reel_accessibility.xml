@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:accessibilityEventTypes="typeWindowStateChanged|typeWindowContentChanged|typeViewScrolled|typeViewSelected|typeWindowsChanged"
+    android:accessibilityFeedbackType="feedbackGeneric"
+    android:accessibilityFlags="flagReportViewIds|flagRetrieveInteractiveWindows"
+    android:canRetrieveWindowContent="true"
+    android:packageNames="com.instagram.android,com.instagram.lite,com.google.android.youtube,com.zhiliaoapp.musically,com.ss.android.ugc.trill,com.zhiliaoapp.musically.go,com.facebook.katana,com.facebook.lite,com.snapchat.android,video.like,com.kwai.bulldog,com.kwai.video,in.mohalla.video,com.eterno.shortvideos,com.eterno.shortvideos.lite"
+    android:notificationTimeout="50"
+    android:description="@string/accessibility_description"
+    android:isAccessibilityTool="false"
+    android:settingsActivity="com.rafi.antireelai.MainActivity" />
