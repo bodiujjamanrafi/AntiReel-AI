@@ -137,7 +137,7 @@ class TrackerStore(context: Context) {
     val restartUsed:Boolean get()=prefs.getString("restartDay",null)==LocalDate.now().toString()
     fun restartForToday():Boolean {
         if(restartUsed || total()<goal)return false
-        val limit=(goal.toLong()+50).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+        val limit=(goal.toLong()+30).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
         prefs.edit().putString("restartDay",LocalDate.now().toString()).putInt("restartLimit",limit).apply()
         if(pauseUntil!=0L)pauseUntil=0
         running=true

@@ -22,7 +22,7 @@
     {
       "title": "Limits and intervention",
       "paragraphs": [
-        "At the daily reel or time boundary, the app may show a red warning, speak, request media pause, return to Home and display its own warning screen. The once-per-day restart allowance adds 50 reels when eligible; an existing time cap still applies. These are deterministic responses to your configured settings, not autonomous decision-making. Home, Back, pause, permission revocation and uninstall remain available."
+        "At the daily reel or time boundary, the app may show a red warning, speak, request media pause, return to Home and display its own warning screen. The once-per-day restart allowance adds 30 reels when eligible; an existing time cap still applies. These are deterministic responses to your configured settings, not autonomous decision-making. Home, Back, pause, permission revocation and uninstall remain available."
       ]
     },
     {

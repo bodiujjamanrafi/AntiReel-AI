@@ -27,7 +27,7 @@ internal enum class SettingsSection(val title:String,val description:String,val 
     APPEARANCE("Appearance","Light, dark & device theme",7,"Make it yours"),
     MISO("Miso & display","Character, counter & motion",8,"Make it yours"),
     GOAL("Daily goal","A custom boundary for your day",5,"Your pace"),
-    RESTART("Restart allowance","One extra allowance of 50 reels per day",24,"Your pace"),
+    RESTART("Restart allowance","One extra allowance of 30 reels per day",24,"Your pace"),
     ALERTS("Breaks & reminders","Break timer, voice & notifications",13,"Your pace"),
     ACCESS("Accessibility","Connection & platform recognition",9,"Your app"),
     ACTIVITY("Activity & storage","Local history & data controls",10,"Your app"),
@@ -79,15 +79,9 @@ internal val settingsCategories=listOf(
     }
 }
 @Composable internal fun SettingsDetails(section:SettingsSection,store:TrackerStore,revision:Int,connected:Boolean,speaker:MisoSpeaker,context:Context,onBack:()->Unit,onConnect:()->Unit,onManage:()->Unit,onAppInfo:()->Unit,onGoal:()->Unit,onErase:()->Unit,onNotifications:()->Unit,tap:()->Unit,onEditAnswers:()->Unit={},onLegalNavigation:()->Unit={}) {
-    var legal by rememberSaveable(section.name){mutableStateOf<String?>(null)}
-    fun closeLegal(){legal=null;onLegalNavigation()}
-    fun openLegal(document:LegalDocument){legal=document.slug;onLegalNavigation()}
-    BackHandler(enabled=legal!=null){closeLegal()}
-    legal?.let {slug->
-        LegalDocument.entries.firstOrNull{it.slug==slug}?.let{document->
-            SettingsTheme {LegalReader(document,::closeLegal)}
-            return
-        }
+    if(section==SettingsSection.PRIVACY) {
+        LaunchedEffect(Unit){ExternalLinks.document(context,LegalDocument.PRIVACY);onBack()}
+        return
     }
     CompositionLocalProvider(LocalMotionReduced provides motionReduced(store.reducedMotion)) {
     SettingsTheme {
@@ -104,9 +98,9 @@ internal val settingsCategories=listOf(
                 SettingsSection.RESTART->{
                     SettingsStats(Triple("${store.total()}","Reels today",23),Triple("${store.goal}","Allowed today",5))
                     SettingsGroup("Restart allowance") {SettingsInset {
-                        UiText(if(store.restartUsed)"Extra allowance used today" else "50 more reels, once today",fontSize=18.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
-                        SettingsText("Available after reaching your daily limit. Your history stays intact. Once these 50 reels are used, the boundary stays in place until tomorrow.")
-                        SettingsAction(if(store.restartUsed)"Available again tomorrow" else "Add 50 reels & restart",{tap();store.restartForToday()},enabled=!store.restartUsed && store.total()>=store.goal,primary=true)
+                        UiText(if(store.restartUsed)"Extra allowance used today" else "30 more reels, once today",fontSize=18.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
+                        SettingsText("Available after reaching your daily limit. Your history stays intact. Once these 30 reels are used, the boundary stays in place until tomorrow.")
+                        SettingsAction(if(store.restartUsed)"Available again tomorrow" else "Add 30 reels & restart",{tap();store.restartForToday()},enabled=!store.restartUsed && store.total()>=store.goal,primary=true)
                     }}
                     SettingsGroup {SettingsFaq("How the extra allowance works",24){SettingsText("Changes to your regular goal apply tomorrow while this allowance is active. Your time boundary still applies.")}}
                 }
@@ -123,19 +117,6 @@ internal val settingsCategories=listOf(
                 }
                 SettingsSection.HELP->{
                     SettingsHelpPage(onConnect,onNotifications)
-                    SettingsGroup("Support") {
-                        SettingsRow("Help & Support",11,"Full guidance and public support page",onClick={openLegal(LegalDocument.SUPPORT)})
-                        SettingsRule()
-                        SettingsRow("Email support",11,SUPPORT_EMAIL,onClick={ExternalLinks.support(context)})
-                    }
-                }
-                SettingsSection.PRIVACY->{
-                    SettingsGroup("Legal & support") {
-                        LegalDocument.entries.forEachIndexed{index,document->
-                            SettingsRow(document.title,document.glyph,onClick={openLegal(document)})
-                            if(index<LegalDocument.entries.lastIndex)SettingsRule()
-                        }
-                    }
                     SettingsGroup("Private by design") {
                         SettingsRow("On-device storage",10,"No account, advertising or internet permission.")
                         SettingsRule()
@@ -155,7 +136,14 @@ internal val settingsCategories=listOf(
                         SettingsRule()
                         SettingsRow("Android app settings",17,"Clear all storage or manage permissions in Android",onClick=onAppInfo)
                     }
+                    SettingsGroup("Support") {
+                        SettingsRow("Help & Support",11,onClick={ExternalLinks.document(context,LegalDocument.SUPPORT)})
+                        SettingsRule()
+                        SettingsRow("Email support",11,SUPPORT_EMAIL,onClick={ExternalLinks.support(context)})
+                    }
                 }
+                SettingsSection.PRIVACY->Unit
+
                 SettingsSection.APP_INFO->{
                     val version=remember{runCatching{context.packageManager.getPackageInfo(context.packageName,0).versionName}.getOrNull() ?: ""}
                     SettingsGroup {SettingsInset {UiText("AntiReels AI",fontSize=22.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text);SettingsText("Version $version")}}

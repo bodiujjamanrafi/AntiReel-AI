@@ -21,11 +21,11 @@ class ActivationAllowanceTest {
             store.goal=2
             assertFalse(store.restartForToday())
             store.increment("instagram");store.increment("instagram")
-            assertTrue(store.restartForToday());assertEquals(52,store.goal)
+            assertTrue(store.restartForToday());assertEquals(32,store.goal)
             assertEquals(2,store.total());assertFalse(store.restartForToday())
-            store.goal=999;assertEquals(52,store.goal)
+            store.goal=999;assertEquals(32,store.goal)
             repeat(55){store.increment("instagram")}
-            assertEquals(52,store.total());assertFalse(store.restartForToday())
+            assertEquals(32,store.total());assertFalse(store.restartForToday())
             store.prefs.edit().putString("restartDay",LocalDate.now().minusDays(1).toString()).commit()
             assertFalse(store.restartUsed);assertEquals(999,store.goal)
         } finally {store.prefs.edit().clear().commit()}

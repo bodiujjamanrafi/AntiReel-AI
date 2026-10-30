@@ -17,13 +17,13 @@ private data class PageRoute(val tab:Int,val detail:String?) {
     val route=PageRoute(tab,detail)
     val progress=remember(route,reduced){Animatable(if(reduced)1f else 0f)}
     LaunchedEffect(progress) {
-        if(!reduced)progress.animateTo(1f,tween(if(route.settings)140 else 160,easing=CubicBezierEasing(.2f,0f,0f,1f)))
+        if(!reduced)progress.animateTo(1f,tween(if(route.settings)100 else 80,easing=CubicBezierEasing(.2f,0f,0f,1f)))
     }
     CompositionLocalProvider(LocalMotionReduced provides reduced) {
         Box(modifier.graphicsLayer {
             val value=progress.value
-            alpha=if(route.settings).85f+.15f*value else .35f+.65f*value
-            scaleX=if(route.settings)1f else .99f+.01f*value
+            alpha=.90f+.10f*value
+            scaleX=1f
             scaleY=scaleX
         }){content()}
     }

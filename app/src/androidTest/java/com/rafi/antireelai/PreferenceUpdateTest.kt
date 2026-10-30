@@ -47,8 +47,8 @@ class PreferenceUpdateTest {
    val agreement=ui.onNodeWithContentDescription("Agree to terms and privacy")
    val settings=ui.onNodeWithText("Agree & open Settings")
    agreement.assertIsOn();settings.assertIsEnabled();assertEquals(0,opened);assertEquals(0,store.prefs.getInt("setupTermsVersion",0));assertFalse(store.consent)
-   agreement.performClick().assertIsOff();settings.assertIsNotEnabled()
-   agreement.performClick();settings.performClick();assertEquals(1,opened);assertEquals(1,store.prefs.getInt("setupTermsVersion",0));assertFalse(store.consent)
+   agreement.performScrollTo().performClick().assertIsOff();settings.assertIsNotEnabled()
+   agreement.performClick();settings.performScrollTo().performClick();assertEquals(0,opened);ui.onNodeWithText("I agree · open Settings").performClick();assertEquals(1,opened);assertEquals(2,store.prefs.getInt("setupTermsVersion",0));assertFalse(store.consent)
   }finally{InstrumentationRegistry.getInstrumentation().runOnMainSync{speaker.close()}}
  }
 }

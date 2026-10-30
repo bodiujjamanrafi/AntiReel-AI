@@ -55,7 +55,7 @@ private val NavigationDestinations=listOf(AppDestination.Today,AppDestination.Pl
     val reduced=motionReduced(reducedMotion)
     val destinations=NavigationDestinations
     val displayIndex=destinations.indexOfFirst{it.ordinal==selected}.coerceAtLeast(0)
-    val motion:androidx.compose.animation.core.FiniteAnimationSpec<Float> = remember(reduced){if(reduced)tween(0) else androidx.compose.animation.core.spring(dampingRatio=1f,stiffness=700f)}
+    val motion:androidx.compose.animation.core.FiniteAnimationSpec<Float> = remember(reduced){if(reduced)tween(0) else androidx.compose.animation.core.spring(dampingRatio=1f,stiffness=1400f)}
     val position=animateFloatAsState(displayIndex.toFloat(),motion,label="notch")
     val path=remember{Path()}
     val topColor=AppStyle.ReelTop;val bottomColor=AppStyle.ReelBottom
@@ -93,8 +93,8 @@ private val NavigationDestinations=listOf(AppDestination.Today,AppDestination.Pl
 @Composable private fun RowScope.NavigationItem(destination:AppDestination,active:Boolean,reducedMotion:Boolean,motion:androidx.compose.animation.core.FiniteAnimationSpec<Float>,onSelect:(Int)->Unit) {
     val language=LocalUiLanguage.current
     val lift=animateFloatAsState(if(active)-24f else 0f,motion,label="icon lift")
-    val color by animateColorAsState(if(active)AppStyle.ReelTop else Color(0xFFFFDFEB),tween(if(reducedMotion)0 else 140),label="icon color")
-    val labelColor by animateColorAsState(if(active)Color(0xFFFFEFF5) else Color(0xFFFFEFF5).copy(alpha=.9f),tween(if(reducedMotion)0 else 140),label="label color")
+    val color by animateColorAsState(if(active)AppStyle.ReelTop else Color(0xFFFFDFEB),tween(if(reducedMotion)0 else 90),label="icon color")
+    val labelColor by animateColorAsState(if(active)Color(0xFFFFEFF5) else Color(0xFFFFEFF5).copy(alpha=.9f),tween(if(reducedMotion)0 else 90),label="label color")
     val density=androidx.compose.ui.platform.LocalDensity.current
     Column(Modifier.weight(1f).fillMaxHeight().selectable(selected=active,interactionSource=remember{MutableInteractionSource()},indication=null,role=Role.Tab,onClick={onSelect(destination.ordinal)}).semantics{contentDescription=UiCopy.translate(destination.label,language)}.padding(top=38.dp),horizontalAlignment=Alignment.CenterHorizontally) {
         Box(Modifier.graphicsLayer{translationY=with(density){lift.value.dp.toPx()}}){AppGlyph(if(destination==AppDestination.Miso)8 else destination.ordinal,color,Modifier.size(28.dp))}

@@ -31,9 +31,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import kotlinx.coroutines.*
 import org.json.JSONObject
 
-@Composable internal fun OnboardingFlow(store:TrackerStore,saveProfile:suspend (OnboardingProfile)->Boolean={profile->withContext(Dispatchers.IO){store.saveOnboardingProfile(profile)}},hapticFeedback:(()->Unit)?=null,startReview:Boolean=false,onExit:(()->Unit)?=null,onFinished:()->Unit) {
+@Composable internal fun OnboardingFlow(store:TrackerStore,saveProfile:suspend (OnboardingProfile)->Boolean={profile->withContext(Dispatchers.IO){store.saveOnboardingProfile(profile)}},hapticFeedback:(()->Unit)?=null,startReview:Boolean=false,skipPreloader:Boolean=false,onExit:(()->Unit)?=null,onFinished:()->Unit) {
     val draft=remember{runCatching{JSONObject(store.prefs.getString("onboardingDraft","{}")!!)}.getOrDefault(JSONObject())}
-    var step by remember{mutableIntStateOf(if(startReview)12 else restoredOnboardingStep(store.prefs.getInt("onboardingStep",-2)))}
+    var step by remember{mutableIntStateOf(if(startReview)12 else restoredOnboardingStep(store.prefs.getInt("onboardingStep",-2)).let{if(skipPreloader && it==-2)-1 else it})}
     var language by remember{mutableStateOf(store.prefs.getString("language","en") ?: "en")}
     var theme by remember{mutableStateOf(store.themeMode)}
     val view=LocalView.current
@@ -52,8 +52,6 @@ import org.json.JSONObject
     var reacting by remember{mutableStateOf(false)}
     val contentScroll=rememberScrollState()
     val pageOpacity=remember{Animatable(1f)}
-    val introScale=remember{Animatable(.92f)}
-    LaunchedEffect(Unit){introScale.animateTo(1f,tween(if(store.reducedMotion)0 else 500))}
     val speaker=remember{MisoSpeaker(store.contextForSpeech)}
     val scope=rememberCoroutineScope()
     val lifecycle=LocalLifecycleOwner.current.lifecycle
@@ -86,10 +84,7 @@ import org.json.JSONObject
     BackHandler(enabled=startReview || canGoBackInOnboarding(step) || review){if(startReview && step !in 0..12)onExit?.invoke() else back()}
     Surface(color=AppStyle.Background,contentColor=AppStyle.Text,modifier=Modifier.fillMaxSize()) {
         if(step==-2) {
-            Box(Modifier.fillMaxSize().safeDrawingPadding().testTag("miso-preloader"),contentAlignment=Alignment.Center) {
-                AndroidView(factory={CompanionView(it)},update={it.animated=!store.reducedMotion;it.pose=MisoPose.HAPPY},
-                    modifier=Modifier.size(190.dp).graphicsLayer{scaleX=introScale.value;scaleY=scaleX})
-            }
+            MisoPreloader()
         } else Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().padding(22.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                 TextButton(onClick={tap();back()},enabled=canGoBackInOnboarding(step) || review){Text(tr("Back","ফিরে যাই"))}
@@ -98,7 +93,7 @@ import org.json.JSONObject
             }
             if(step in 0..11){LinearProgressIndicator(progress={(onboardingQuestionIds.indexOf(step)+1)/onboardingQuestionIds.size.toFloat()},modifier=Modifier.fillMaxWidth());Text(tr("Question ${onboardingQuestionIds.indexOf(step)+1} of ${onboardingQuestionIds.size}","প্রশ্ন ${onboardingQuestionIds.indexOf(step)+1} / ${onboardingQuestionIds.size}"),fontSize=12.sp,color=AppStyle.Muted)}
             Column(Modifier.weight(1f).verticalScroll(contentScroll).graphicsLayer{alpha=pageOpacity.value},horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(14.dp)) {
-                AndroidView(factory={CompanionView(it)},update={it.animated=!store.reducedMotion;it.talking=speaker.speaking;it.progress=0f;it.pose=onboardingPose(if(review)12 else step,choice(step),busy || reacting)},modifier=Modifier.size(if(step==-2)190.dp else if(step==12 || review)140.dp else 112.dp).graphicsLayer{scaleX=if(step==-2)introScale.value else 1f;scaleY=scaleX})
+                AndroidView(factory={CompanionView(it)},update={it.animated=!store.reducedMotion;it.talking=speaker.speaking;it.progress=0f;it.pose=onboardingPose(if(review)12 else step,choice(step),busy || reacting)},modifier=Modifier.size(if(step==-2)190.dp else if(step==12 || review)140.dp else 112.dp))
                 Text(dialogue,fontSize=25.sp,lineHeight=34.sp,fontWeight=FontWeight.SemiBold)
                 if(speaker.unavailable)Text(tr("An offline voice for this language isn't installed. You can continue without speech.","এই ভাষার অফলাইন কণ্ঠ নেই। কণ্ঠ ছাড়াও এগিয়ে যেতে পারো।"),fontSize=12.sp,color=AppStyle.Muted)
                 if(review || step==12) {

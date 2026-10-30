@@ -93,7 +93,12 @@ class MainActivity: ComponentActivity() {
             MaterialTheme(colorScheme=palette) { CompositionLocalProvider(LocalContentColor provides palette.onBackground,LocalUiLanguage provides language) {
                 var onboarding by remember {mutableStateOf(!store.prefs.getBoolean("onboardingComplete",false))}
                 DisposableEffect(Unit){val listener=SharedPreferences.OnSharedPreferenceChangeListener{_,key->if(key=="onboardingRestartRequested" && store.prefs.getBoolean(key,false))onboarding=true};store.prefs.registerOnSharedPreferenceChangeListener(listener);onDispose{store.prefs.unregisterOnSharedPreferenceChangeListener(listener)}}
-                if(onboarding)OnboardingFlow(store){store.prefs.edit().putBoolean("onboardingNeedsSetup",!connected() || !store.consent).putBoolean("onboardingRestartRequested",false).apply();onboarding=false} else App()
+                // Android 12+ already shows Miso in the native splash. Only Android 11
+                // needs the legacy fallback; never show both on the same launch.
+                var legacySplashFinished by rememberSaveable{mutableStateOf(android.os.Build.VERSION.SDK_INT>=31)}
+                LaunchedEffect(Unit){if(!legacySplashFinished){delay(650);legacySplashFinished=true}}
+                if(!legacySplashFinished)Surface(color=AppStyle.Background,modifier=Modifier.fillMaxSize()){MisoPreloader()}
+                else if(onboarding)OnboardingFlow(store,skipPreloader=true){store.prefs.edit().putBoolean("onboardingNeedsSetup",!connected() || !store.consent).putBoolean("onboardingRestartRequested",false).apply();onboarding=false} else App()
             } }
         }
     }
@@ -406,7 +411,7 @@ class MainActivity: ComponentActivity() {
                             3 -> {
                                 item("settings:${settingsSection ?: "index"}") {
                                     val section=SettingsSection.entries.find{it.name==settingsSection}
-                                    if(section==null)SettingsIndex(onOpen={tap();settingsSection=it},onPlatforms={tap();platformManagerFromSettings=true;settingsPlatforms=true;change(1)})
+                                    if(section==null)SettingsIndex(onOpen={tap();if(it==SettingsSection.PRIVACY.name)ExternalLinks.document(this@MainActivity,LegalDocument.PRIVACY) else settingsSection=it},onPlatforms={tap();platformManagerFromSettings=true;settingsPlatforms=true;change(1)})
                                     else Box(Modifier.fillMaxWidth(),contentAlignment=Alignment.TopCenter) {
                                         SettingsDetails(section,store,revision,enabled,speaker,this@MainActivity,
                                         onBack={tap();settingsSection=null},onConnect={change(AppDestination.Miso.ordinal)},

@@ -50,7 +50,7 @@ internal object BreakReminders {
         if(until<=System.currentTimeMillis())return
         channels(context)
         NotificationManagerCompat.from(context).notify(TIMER_ID,NotificationCompat.Builder(context,TIMER_CHANNEL)
-            .setSmallIcon(R.drawable.ic_miso_notification).setContentTitle(localized(store.prefs.getString("language","en") ?: "en","A little time for you","নিজের জন্য একটু সময়"))
+            .setSmallIcon(R.drawable.ic_miso_notification).setSubText("Antireels AI").setContentTitle(localized(store.prefs.getString("language","en") ?: "en","A little time for you","নিজের জন্য একটু সময়"))
             .setContentText(localized(store.prefs.getString("language","en") ?: "en","Miso is on a break. Your countdown is running.","মিসো বিরতিতে আছে। কাউন্টডাউন চলছে।"))
             .setWhen(until).setShowWhen(true).setUsesChronometer(true).setChronometerCountDown(true)
             .setTimeoutAfter((until-System.currentTimeMillis()).coerceAtLeast(1L)).setOngoing(true).setOnlyAlertOnce(true).setContentIntent(open(context))
@@ -68,7 +68,7 @@ internal object BreakReminders {
         if(!store.breakNotifications || !allowed(context))return
         channels(context)
         NotificationManagerCompat.from(context).notify(DONE_ID,NotificationCompat.Builder(context,CHIME_CHANNEL)
-            .setSmallIcon(R.drawable.ic_miso_notification).setContentTitle(localized(store.prefs.getString("language","en") ?: "en","Your breather is complete","তোমার বিরতি শেষ"))
+            .setSmallIcon(R.drawable.ic_miso_notification).setSubText("Antireels AI").setContentTitle(localized(store.prefs.getString("language","en") ?: "en","Your breather is complete","তোমার বিরতি শেষ"))
             .setContentText(localized(store.prefs.getString("language","en") ?: "en",if(store.running) "Miso is ready to keep you company again." else "Take your time. Miso is here when you need a hand.",if(store.running)"মিসো আবার তোমার পাশে থাকতে প্রস্তুত।" else "সময় নাও। প্রয়োজন হলে মিসো পাশে আছে।"))
             .setAutoCancel(true).setContentIntent(open(context)).setCategory(NotificationCompat.CATEGORY_REMINDER).build())
     }

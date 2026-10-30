@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -30,7 +31,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 
-/** The player uses remaining space; access actions are outside it and never scroll away. */
+/** Bounded portrait video and scrollable content retain touch targets on compact displays. */
 @Composable internal fun MisoPage(store:TrackerStore,speaker:MisoSpeaker,accessEnabled:Boolean,running:Boolean,paused:Boolean,modifier:Modifier=Modifier,onAgree:()->Unit,onManage:()->Unit,onToggle:()->Unit,onPlatforms:()->Unit) {
     val language=LocalUiLanguage.current
     val connected=store.consent && accessEnabled && MisoServiceConnection.connected
@@ -51,29 +52,30 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
             {disclosure=true},onManage,onToggle,onPlatforms)
     }
     if(disclosure)AccessibilityDisclosure(onAccept={disclosure=false;store.prefs.edit().putInt("setupTermsVersion",2).apply();onAgree()},onDecline={disclosure=false})
-    Column(modifier,verticalArrangement=Arrangement.spacedBy(10.dp)) {
-        Row(verticalAlignment=Alignment.CenterVertically) {
-            Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
-                UiText(if(connected)"Your Miso" else "Connect Miso",fontSize=27.sp,fontWeight=FontWeight.Bold,color=AppStyle.Text)
-                UiText(if(connected)if(paused)"Connected · on a break" else if(running)"Connected · active" else "Connected · paused" else if(accessEnabled)"Waiting for Android to connect" else "Watch the guide, or open Settings now",fontSize=12.sp,color=AppStyle.Muted)
+    BoxWithConstraints(modifier) {
+        val videoHeight=(maxHeight*.38f).coerceIn(196.dp,280.dp)
+        Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()),verticalArrangement=Arrangement.spacedBy(16.dp)) {
+            Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(12.dp)) {
+                Mascot(store,store.total(),Modifier.size(72.dp),talking=speaker.speaking || (language!="bn" && videoSpeaking))
+                Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(6.dp)) {
+                    UiText(if(connected)"Your Miso" else "Connect Miso",fontSize=23.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
+                    Row(verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(6.dp)) {
+                        AppGlyph(if(connected)20 else 9,if(connected)AppStyle.Teal else AppStyle.Muted,Modifier.size(16.dp))
+                        UiText(if(connected)if(paused)"Connected · on a break" else if(running)"Connected · active" else "Connected · paused" else if(accessEnabled)"Waiting for Android to connect" else "Watch the guide, or open Settings now",fontSize=12.sp,lineHeight=18.sp,color=AppStyle.Muted,modifier=Modifier.weight(1f))
+                    }
+                }
             }
-            Mascot(store,store.total(),Modifier.size(64.dp),talking=speaker.speaking || (language!="bn" && videoSpeaking))
+            Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
+                UiText("20-second setup video",fontSize=15.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
+                SetupVideo(Modifier.fillMaxWidth(),videoHeight,position,playIntent,{videoSpeaking=it},speaker,!store.prefs.getBoolean("onboardingMuted",false),actions)
+            }
+            actions()
         }
-        SetupVideo(Modifier.weight(1f).fillMaxWidth(),position,playIntent,{videoSpeaking=it},speaker,!store.prefs.getBoolean("onboardingMuted",false),actions)
-        actions()
     }
 }
 
 @Composable private fun MisoAccessActions(connected:Boolean,running:Boolean,noPlatforms:Boolean,agreed:Boolean,onAgreement:(Boolean)->Unit,onDocument:(String)->Unit,onAgree:()->Unit,onManage:()->Unit,onToggle:()->Unit,onPlatforms:()->Unit) {
-    Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(6.dp)) {
-        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.Center) {
-            TextButton(onClick={onDocument("Terms of use")},contentPadding=PaddingValues(horizontal=10.dp,vertical=4.dp)) {
-                AppGlyph(11,AppStyle.Muted,Modifier.size(17.dp));Spacer(Modifier.width(5.dp));UiText("Terms",fontSize=12.sp,color=AppStyle.Muted)
-            }
-            TextButton(onClick={onDocument("Services & privacy")},contentPadding=PaddingValues(horizontal=10.dp,vertical=4.dp)) {
-                AppGlyph(12,AppStyle.Muted,Modifier.size(17.dp));Spacer(Modifier.width(5.dp));UiText("Services",fontSize=12.sp,color=AppStyle.Muted)
-            }
-        }
+    Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(10.dp)) {
         if(!connected) {
             UiText("Miso reads visible player labels and page changes in selected apps to estimate reels/time and display over them. At your limit it requests media pause, goes Home and shows a warning. Processing stays on-device; screen text is never saved or shared. You can decline or revoke access anytime.",fontSize=12.sp,lineHeight=17.sp,color=AppStyle.Muted)
         }
@@ -82,7 +84,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
             UiText("I agree to the terms and service information",fontSize=12.sp,color=AppStyle.Text,modifier=Modifier.weight(1f))
         }
         if(connected) {
-            OutlinedButton(onClick=if(noPlatforms)onPlatforms else onToggle,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(12.dp),border=androidx.compose.foundation.BorderStroke(1.dp,AppStyle.Frame)) {
+            FilledTonalButton(onClick=if(noPlatforms)onPlatforms else onToggle,modifier=Modifier.fillMaxWidth().heightIn(min=48.dp),shape=RoundedCornerShape(12.dp),colors=ButtonDefaults.filledTonalButtonColors(containerColor=AppStyle.Teal.copy(alpha=.12f),contentColor=AppStyle.Teal)) {
                 AppGlyph(if(noPlatforms)1 else if(running)22 else 14,AppStyle.Teal,Modifier.size(21.dp));Spacer(Modifier.width(10.dp))
                 UiText(if(noPlatforms)"Choose your platforms" else if(running)"Pause Miso" else "Start Miso",fontWeight=FontWeight.SemiBold)
             }
@@ -91,12 +93,21 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
             AppGlyph(9,AppStyle.Background,Modifier.size(22.dp));Spacer(Modifier.width(10.dp))
             UiText(if(connected)"Accessibility · open Settings" else "Agree & open Settings",fontSize=15.sp,fontWeight=FontWeight.SemiBold)
         }
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.Center) {
+            TextButton(onClick={onDocument("Terms of use")},contentPadding=PaddingValues(horizontal=10.dp,vertical=4.dp)) {
+                AppGlyph(11,AppStyle.Muted,Modifier.size(17.dp));Spacer(Modifier.width(5.dp));UiText("Terms",fontSize=12.sp,color=AppStyle.Muted)
+            }
+            TextButton(onClick={onDocument("Services & privacy")},contentPadding=PaddingValues(horizontal=10.dp,vertical=4.dp)) {
+                AppGlyph(12,AppStyle.Muted,Modifier.size(17.dp));Spacer(Modifier.width(5.dp));UiText("Services",fontSize=12.sp,color=AppStyle.Muted)
+            }
+        }
+
     }
 }
 
 private object SetupPosterCache { @Volatile var image:ImageBitmap?=null }
 
-@Composable private fun SetupVideo(modifier:Modifier,position:IntArray,playIntent:BooleanArray,onSpeaking:(Boolean)->Unit,speaker:MisoSpeaker,voiceAllowed:Boolean,accessActions:@Composable ()->Unit) {
+@Composable private fun SetupVideo(modifier:Modifier,videoHeight:Dp,position:IntArray,playIntent:BooleanArray,onSpeaking:(Boolean)->Unit,speaker:MisoSpeaker,voiceAllowed:Boolean,accessActions:@Composable ()->Unit) {
     val language=LocalUiLanguage.current
     var caption by remember{mutableStateOf("")}
     var initialized by remember{mutableStateOf(playIntent[0])}
@@ -153,16 +164,16 @@ private object SetupPosterCache { @Volatile var image:ImageBitmap?=null }
     fun toggle(){if(!initialized){playIntent[0]=true;initialized=true}else if(playing){holder[0]?.pause();playing=false;playIntent[0]=false}else{holder[0]?.start();playing=true;playIntent[0]=true}}
     fun expand(value:Boolean){position[0]=holder[0]?.currentPosition ?: position[0];holder[0]?.pause();fullscreen=value}
     Column(modifier,verticalArrangement=Arrangement.spacedBy(4.dp)) {
-        if(!fullscreen)BoxWithConstraints(Modifier.weight(1f).fillMaxWidth(),contentAlignment=Alignment.Center) {
-            val width=minOf(maxWidth,maxHeight*9f/16f)
+        if(!fullscreen)BoxWithConstraints(Modifier.height(videoHeight).fillMaxWidth(),contentAlignment=Alignment.Center) {
+            val width=minOf(maxWidth,videoHeight*9f/16f)
             player(Modifier.width(width).aspectRatio(9f/16f).background(Color(0xFF10131B)))
-        } else Spacer(Modifier.weight(1f))
-        if(language=="bn" && caption.isNotEmpty())UiText(caption,fontSize=12.sp,color=AppStyle.Text)
+        } else Spacer(Modifier.height(videoHeight))
+        if(language=="bn")Box(Modifier.fillMaxWidth().heightIn(min=36.dp)){UiText(caption,fontSize=12.sp,color=AppStyle.Text)}
         if(language=="bn" && speaker.unavailable)UiText("বাংলা কণ্ঠের জন্য অ্যান্ড্রয়েডে একটি অফলাইন বাংলা কণ্ঠ ইনস্টল করো। নির্দেশনা পর্দায় দেখা যাবে।",fontSize=11.sp,color=AppStyle.Muted)
         Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceEvenly,verticalAlignment=Alignment.CenterVertically) {
-            TextButton(onClick=::toggle){AppGlyph(if(playing)22 else 14,AppStyle.Teal,Modifier.size(20.dp));Spacer(Modifier.width(6.dp));UiText(if(playing)"Pause" else "Play")}
-            TextButton(onClick={initialized=true;position[0]=0;holder[0]?.seekTo(0);holder[0]?.start();playIntent[0]=true;playing=true}){UiText("Replay")}
-            TextButton(onClick={expand(true)}){UiText("Full screen")}
+            TextButton(onClick=::toggle,modifier=Modifier.weight(1f).heightIn(min=48.dp),contentPadding=PaddingValues(horizontal=2.dp)){AppGlyph(if(playing)22 else 14,AppStyle.Teal,Modifier.size(20.dp));Spacer(Modifier.width(6.dp));UiText(if(playing)"Pause" else "Play")}
+            TextButton(onClick={initialized=true;position[0]=0;holder[0]?.seekTo(0);holder[0]?.start();playIntent[0]=true;playing=true},modifier=Modifier.weight(1f).heightIn(min=48.dp),contentPadding=PaddingValues(horizontal=2.dp)){UiText("Replay")}
+            TextButton(onClick={expand(true)},modifier=Modifier.weight(1f).heightIn(min=48.dp),contentPadding=PaddingValues(horizontal=2.dp)){UiText("Full screen")}
         }
         if(failed)UiText("The video could not play. You can still open Settings below.",fontSize=12.sp,color=AppStyle.Muted)
     }

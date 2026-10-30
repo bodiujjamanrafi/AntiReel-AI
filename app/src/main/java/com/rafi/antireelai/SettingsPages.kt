@@ -44,8 +44,6 @@ import androidx.compose.ui.unit.sp
     if(store.pauseUntil>System.currentTimeMillis())BreakTimer(store.pauseUntil){store.pauseUntil=0}
     SettingsGroup("Voice & greetings") {
         SettingsPreferenceSwitch(store,"voiceEnabled","Welcome greeting","Hear Miso automatically on first launch.",6){tap();store.voiceEnabled=it;if(!it)speaker.stop()}
-        SettingsRule()
-        SettingsInset {SettingsAction("Hear Miso",{tap();speaker.greet()},enabled=speaker.ready)}
         if(speaker.unavailable)SettingsInset {SettingsText("Install an offline voice for your selected language in Android text-to-speech settings. Keep speech/media volume audible to hear Miso.")}
     }
     SettingsGroup("Limit warnings") {

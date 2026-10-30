@@ -16,7 +16,7 @@ internal object SettingsCopy {
         "Text, controls and Miso adapt to your selected theme." to "লেখা, নিয়ন্ত্রণ ও মিসো তোমার বেছে নেওয়া থিম অনুসরণ করে।",
         "0–1440 minutes. Set 0 for no time boundary." to "০–১৪৪০ মিনিট। সময়ের সীমা না রাখতে ০ লেখো।",
         "Changes to your regular goal apply tomorrow while this allowance is active." to "এই অতিরিক্ত সীমা চালু থাকলে নিয়মিত লক্ষ্যের পরিবর্তন আগামীকাল প্রযোজ্য হবে।",
-        "Available after reaching your daily limit. Your history stays intact. Once these 50 reels are used, the boundary stays in place until tomorrow." to "দৈনিক সীমায় পৌঁছালে পাওয়া যাবে। ইতিহাস অক্ষত থাকবে। অতিরিক্ত ৫০টি রিলস শেষ হলে আগামীকাল পর্যন্ত সীমা থাকবে।",
+        "Available after reaching your daily limit. Your history stays intact. Once these 30 reels are used, the boundary stays in place until tomorrow." to "দৈনিক সীমায় পৌঁছালে পাওয়া যাবে। ইতিহাস অক্ষত থাকবে। অতিরিক্ত ৩০টি রিলস শেষ হলে আগামীকাল পর্যন্ত সীমা থাকবে।",
         "Changes to your regular goal apply tomorrow while this allowance is active. Your time boundary still applies." to "অতিরিক্ত সীমা চালু থাকলে নিয়মিত লক্ষ্যের পরিবর্তন আগামীকাল প্রযোজ্য হবে। সময়ের সীমা বহাল থাকবে।",
         "Hear Miso automatically on first launch." to "প্রথমবার অ্যাপ খোলায় মিসোর কথা শুনবে।", "Miso speaks near, at and beyond your goal." to "লক্ষ্যের কাছে, লক্ষ্যে ও তা পেরোলে মিসো কথা বলে।",
         "A red warning from 80%. At your limit, counting stops." to "৮০% থেকে লাল সতর্কতা। সীমায় পৌঁছালে গণনা বন্ধ।",
