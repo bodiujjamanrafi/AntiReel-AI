@@ -5,7 +5,7 @@ internal data class OnboardingQuestion(val en:String,val bn:String,val options:L
 internal val onboardingQuestionIds=listOf(0,2,8,11)
 internal val onboardingQuestions=mapOf(
     0 to OnboardingQuestion("What should I call you?","আমি তোমাকে কী নামে ডাকব?",listOf(),listOf()),
-    2 to OnboardingQuestion("Which platforms do you watch short videos on most?","কোন অ্যাপে বেশি ছোট ভিডিও দেখো?",listOf("Instagram","Facebook","YouTube Shorts","TikTok","Other"),listOf("ইনস্টাগ্রাম","ফেসবুক","ইউটিউব শর্টস","টিকটক","অন্যান্য")),
+    2 to OnboardingQuestion("Which platforms do you watch short videos on most?","কোন অ্যাপে বেশি ছোট ভিডিও দেখো?",listOf("Instagram","Facebook","YouTube Shorts","TikTok","Other","Facebook Lite"),listOf("ইনস্টাগ্রাম","ফেসবুক","ইউটিউব শর্টস","টিকটক","অন্যান্য","ফেসবুক লাইট")),
     8 to OnboardingQuestion("How many reels would you like each day?","প্রতিদিন কতটি রিলস দেখতে চাও?",listOf("5 reels","10 reels","20 reels","30 reels","50 reels","Custom number"),listOf("৫টি রিলস","১০টি রিলস","২০টি রিলস","৩০টি রিলস","৫০টি রিলস","নিজে সংখ্যা লিখি")),
     11 to OnboardingQuestion("Ready to take control of your scrolling?","নিজের স্ক্রল করার অভ্যাস নিয়ন্ত্রণে প্রস্তুত?",listOf("Yes, let’s do this!","Start small","Review my goals"),listOf("হ্যাঁ, শুরু করি!","অল্প করে শুরু করি","লক্ষ্যগুলো দেখি"))
 )

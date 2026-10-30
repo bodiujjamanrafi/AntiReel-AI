@@ -6,7 +6,7 @@ internal class PreferenceUiUpdates {
     fun collect(key:String?):Boolean {
         if(key==null || key.startsWith("status:") || key.startsWith("nudged:") || key=="refreshUsageRequest")return false
         pending=pending or SETTINGS
-        if(key=="lastUsageUpdate" || key=="activityEpoch" || key.startsWith("count:") || key.startsWith("usage:"))pending=pending or ACTIVITY
+        if(key==CustomPlatforms.KEY || key=="lastUsageUpdate" || key=="activityEpoch" || key.startsWith("count:") || key.startsWith("usage:"))pending=pending or ACTIVITY
         return true
     }
     fun drain():Int=pending.also{pending=0}

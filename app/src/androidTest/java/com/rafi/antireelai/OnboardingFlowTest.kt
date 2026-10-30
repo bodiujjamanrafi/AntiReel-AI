@@ -35,6 +35,29 @@ class OnboardingFlowTest {
   }
  }
  private fun draft(name:String="Rafi")=JSONObject().apply{put("name",name);for(i in 1..11)put("a$i","0")}
+ @Test fun preloaderHasNoHeaderOrQuestionControlsAndLanguageFooterDoesNotMove()=isolated{store->
+  ui.mainClock.autoAdvance=false
+  ui.setContent{MaterialTheme{OnboardingFlow(store){}}}
+  ui.mainClock.advanceTimeByFrame()
+  ui.onNodeWithTag("miso-preloader").assertIsDisplayed()
+  ui.onNodeWithTag("onboarding-footer").assertDoesNotExist()
+  ui.onNodeWithText("antireel").assertDoesNotExist()
+  ui.mainClock.advanceTimeBy(800)
+  ui.onNodeWithTag("onboarding-continue").assertIsDisplayed()
+  val first=ui.onNodeWithTag("onboarding-continue").fetchSemanticsNode().boundsInRoot
+  ui.mainClock.advanceTimeBy(1500)
+  assertEquals(first,ui.onNodeWithTag("onboarding-continue").fetchSemanticsNode().boundsInRoot)
+  ui.mainClock.autoAdvance=true
+ }
+ @Test fun facebookLiteCannotBeAddedOrTrackedButItsHistoryIsRetained()=isolated{store->
+  val today=java.time.LocalDate.now()
+  store.prefs.edit().putStringSet("platforms",setOf("facebook_lite","instagram"))
+   .putInt("count:$today:facebook_lite",3).commit()
+  assertFalse(store.addCustomPlatform("com.facebook.lite","Facebook Lite"))
+  assertFalse(store.visibleSelected.contains("facebook_lite"))
+  assertFalse(store.trackedPlatforms.any{it.id=="facebook_lite"})
+  assertEquals(10,store.total())
+ }
  @Test fun englishJourneyPersistsRealAllowanceWithoutClearingHistory()=isolated{store->
   var finished=false
   ui.setContent{MaterialTheme{OnboardingFlow(store){finished=true}}}

@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /** The same Platforms destination and callbacks, presented compactly when entered from Settings. */
-@Composable internal fun SettingsPlatforms(query:String,onQuery:(String)->Unit,filter:PlatformFilter,onFilter:(PlatformFilter)->Unit,selected:Set<String>,installed:Set<String>,counts:List<Int>,running:Boolean,status:(String)->String,onToggle:(Platform,Boolean)->Unit,onOpen:(Platform)->Unit,onBack:()->Unit,onSelectInstalled:()->Unit,onClear:()->Unit,onSelectVisible:()->Unit) {
+@Composable internal fun SettingsPlatforms(query:String,onQuery:(String)->Unit,filter:PlatformFilter,onFilter:(PlatformFilter)->Unit,selected:Set<String>,installed:Set<String>,counts:List<Int>,running:Boolean,status:(String)->String,onToggle:(Platform,Boolean)->Unit,onOpen:(Platform)->Unit,onBack:()->Unit,onSelectInstalled:()->Unit,onClear:()->Unit,onSelectVisible:()->Unit,onAddCustom:()->Unit={},onRemoveCustom:(Platform)->Unit={}) {
     val visible=filterPlatforms(platforms,query,filter,selected,installed)
     SettingsTheme {
         Column(Modifier.widthIn(max=640.dp).fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(16.dp)) {
@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.sp
             LazyRow(horizontalArrangement=Arrangement.spacedBy(8.dp)) {
                 items(PlatformFilter.entries,key={it.name}){item->FilterChip(modifier=Modifier.heightIn(min=48.dp),selected=filter==item,onClick={onFilter(item)},label={UiText(item.label)})}
             }
+            SettingsGroup {SettingsRow("Add custom platform",25,onClick=onAddCustom)}
             SettingsGroup("Available platforms") {
                 if(visible.isEmpty())SettingsInset {SettingsText("No matching platforms")}
                 visible.forEachIndexed {index,p->
@@ -37,12 +38,13 @@ import androidx.compose.ui.unit.sp
                         PlatformBrand(p,Modifier.size(32.dp))
                         Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(4.dp)) {
                             UiText(p.name,fontSize=15.sp,color=AppStyle.Text)
-                            SettingsText(if(p.id in selected && running && p.id in installed)status(p.id) else if(p.id in installed)"Installed" else p.subtitle)
+                            SettingsText(if(p.isCustom)p.trackingLabel else if(p.id in selected && running && p.id in installed)status(p.id) else if(p.id in installed)"Installed" else p.subtitle)
                             if(p.id in selected)SettingsText("${counts.getOrElse(platforms.indexOf(p)){0}} reels today")
                         }
-                        Checkbox(p.id in selected,{onToggle(p,it)},modifier=Modifier.semantics{contentDescription="Track ${p.name}"})
+                        Checkbox(p.id in selected,{onToggle(p,it)},enabled=p.detectorId!=null,modifier=Modifier.semantics{contentDescription="Track ${p.name}"})
                         TextButton(onClick={onOpen(p)},modifier=Modifier.widthIn(min=48.dp).heightIn(min=48.dp),contentPadding=PaddingValues(horizontal=4.dp)){UiText(if(p.id in installed)"Open" else "Install",fontSize=14.sp)}
                     }
+                    if(p.isCustom)TextButton(onClick={onRemoveCustom(p)},modifier=Modifier.fillMaxWidth().heightIn(min=48.dp)){UiText("Remove custom platform",fontSize=13.sp,color=AppStyle.Muted)}
                 }
             }
             SettingsGroup("Selection") {

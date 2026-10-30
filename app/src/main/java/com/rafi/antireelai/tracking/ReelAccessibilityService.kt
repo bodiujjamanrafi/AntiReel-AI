@@ -52,6 +52,8 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
     private var label: TextView? = null
     private var contextLabel: TextView? = null
     private var active: Platform? = null
+    private var selectedIds:Set<String> = emptySet()
+    private var monitoredByPackage:Map<String,Platform> = emptyMap()
     private var busy = false
     private var lastInspectAt = Long.MIN_VALUE / 2
     private var destroyed = false
@@ -73,8 +75,10 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
     }
     private val eventInspection = Runnable { inspect() }
     private val tick = object : Runnable {
-        override fun run() { inspect(); if(!destroyed) handler.postDelayed(this, if(!store.running || !store.consent || store.selected.isEmpty()) 4000 else if(active == null) 1200 else 650) }
+        override fun run() { inspect(); if(!destroyed && heartbeatRequired() && !handler.hasCallbacks(this)) handler.postDelayed(this,if(active==null)1200 else 650) }
     }
+    private fun heartbeatRequired()=::store.isInitialized && trackingHeartbeatRequired(
+        store.running,store.consent,selectedIds.isNotEmpty(),store.pauseUntil>System.currentTimeMillis())
     override fun onServiceConnected() {
         if(destroyed)return
         if(!::store.isInitialized)store = TrackerStore(this)
@@ -92,8 +96,11 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         handler.post(tick)
     }
     private fun restrictEventPackages() {
-        val selected=store.selected
-        val packages=platforms.filter { it.id in selected }.flatMap { it.packages }.distinct()
+        PlatformCatalog.refresh(store)
+        val tracked=store.trackedPlatforms
+        selectedIds=tracked.map{it.id}.toSet()
+        monitoredByPackage=tracked.flatMap{p->p.packages.map{it to p}}.toMap()
+        val packages=monitoredByPackage.keys
         // An empty packageNames array means "all apps" to Android. Use our own
         // package as a harmless placeholder when no platforms are selected.
         val info=serviceInfo ?: return
@@ -105,7 +112,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         if (!::store.isInitialized || event == null || destroyed || !scanGate.connected) return
         val pkg=event.packageName?.toString() ?: return
         if(pkg == packageName) return
-        val p=platforms.find { pkg in it.packages && it.id in store.selected }
+        val p=monitoredByPackage[pkg]
         if(p == null && active == null) return
         if(!store.running || !store.consent || store.pauseUntil>System.currentTimeMillis()) return
         val playerEvent=event.eventType==AccessibilityEvent.TYPE_VIEW_SCROLLED || event.eventType==AccessibilityEvent.TYPE_VIEW_SELECTED ||
@@ -153,7 +160,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         } finally {currentWindows.forEach{it.recycle()}}
     }
     private fun trackingAllowed()=scanGate.connected && ::store.isInitialized && store.running && store.consent &&
-        store.selected.isNotEmpty() && store.pauseUntil<=System.currentTimeMillis() &&
+        selectedIds.isNotEmpty() && store.pauseUntil<=System.currentTimeMillis() &&
         !getSystemService(KeyguardManager::class.java).isKeyguardLocked && getSystemService(PowerManager::class.java).isInteractive
     private fun foregroundPackage():String? {
         val node=runCatching{root()}.getOrNull() ?: return null
@@ -177,15 +184,16 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         scanRequested=false
         val youtubeGeneration=youtube.generation
         val ticket = scanGate.ticket()
-        val selected = store.selected
+        val selected = selectedIds
+        val detectors = monitoredByPackage
         executor.execute {
             val result = runCatching {
                 if(!scanGate.accepts(ticket))return@runCatching null
                 val root = root() ?: return@runCatching null
                 try {
-                    val p = platforms.find { root.packageName?.toString() in it.packages && it.id in selected } ?: return@runCatching null
+                    val p = detectors[root.packageName?.toString()]?.takeIf{it.id in selected} ?: return@runCatching null
                     val nodes=snapshotReelNodes(root,resources.displayMetrics.widthPixels,resources.displayMetrics.heightPixels,p.id=="youtube"){!scanGate.accepts(ticket)}
-                    Triple(p, root.packageName.toString(), if(p.id=="youtube")YouTubeShortsRecognition.recognize(nodes) else ReelRecognition.recognize(p.id,nodes))
+                    Triple(p, root.packageName.toString(), PackageDetectors.recognize(p.detectorId,nodes))
                 } finally { root.recycle() }
             }.getOrNull()
             handler.post {
@@ -198,7 +206,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
                     active?.let { store.status(it.id,"background") }; active=null; tracker.reset(); clearPager(); hide(); return@post
                 }
                 val (p,pkg,frame)=result
-                if(p.id !in store.selected)return@post
+                if(p.id !in selectedIds)return@post
                 if(frame.recognized && store.allowanceReached()){enforceLimit(p);return@post}
                 val obscured=warningGlow!=null && store.limitTint && store.allowanceProgress()>=LIMIT_CURTAIN_FRACTION
                 recordUsage(if(frame.recognized && !obscured) p.id else null,!frame.recognized || obscured)
@@ -221,7 +229,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
                 }
                 if(frame.recognized && store.allowanceReached()){enforceLimit(p);return@post}
                 if(frame.recognized) {show(p,frame);nudge()} else hide()
-                store.status(p.id, when { overlayFailed -> "overlay_failed"; !frame.recognized -> "waiting_player"; obscured -> "limit_covered"; frame.fingerprint != null -> "tracking"; store.compatibility -> "pager_mode"; else -> "missing_labels" })
+                store.status(p.id, when { frame.reason=="accessibility_unavailable" -> "accessibility_unavailable"; overlayFailed -> "overlay_failed"; !frame.recognized -> "waiting_player"; obscured -> "limit_covered"; frame.fingerprint != null -> "tracking"; store.compatibility -> "pager_mode"; else -> "missing_labels" })
                 if((if(p.id=="youtube")youtube.pending else tracker.pending) && !handler.hasCallbacks(eventInspection)) handler.postDelayed(eventInspection,80)
             }
         }
@@ -242,7 +250,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
     private fun enforceLimit(platform:Platform) {
         // A scan may finish after the user has left the selected player. Never
         // send Home or pause another app based on that old frame.
-        if(!trackingAllowed() || platform.id !in store.selected || foregroundPackage() !in platform.packages)return
+        if(!trackingAllowed() || platform.id !in selectedIds || foregroundPackage() !in platform.packages)return
         recordUsage(null,true);tracker.reset();clearPager()
         store.status(platform.id,"limit_reached")
         val now=SystemClock.elapsedRealtime()
@@ -256,7 +264,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         val ticket=scanGate.ticket()
         val task=Runnable{
             limitScreen=null
-            if(!destroyed && scanGate.accepts(ticket) && trackingAllowed() && platform.id in store.selected && store.allowanceReached()) {
+            if(!destroyed && scanGate.accepts(ticket) && trackingAllowed() && platform.id in selectedIds && store.allowanceReached()) {
                 runCatching{startActivity(Intent(this,LimitReachedActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))}
             }
         }
@@ -294,7 +302,12 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
             try { getSystemService(WindowManager::class.java).addView(box,params()); overlay=box; overlayFailed=false }
             catch (_: RuntimeException) { overlayFailed=true; return }
         }
-        val stage=LimitStage.at((store.allowanceProgress()*100).toInt(),100)
+        // One coherent preference snapshot per overlay update, rather than repeatedly
+        // summing every platform for each label and reaction property.
+        val total=store.total()
+        val goal=store.goal
+        val progress=dailyAllowanceProgress(total,goal,store.totalUsage(),store.dailyMinutes)
+        val stage=LimitStage.at((progress*100).toInt(),100)
         val over=stage!=LimitStage.NONE && store.limitTint
         if(over && warningGlow==null) {
             val glow=LimitGlowView(this)
@@ -305,11 +318,11 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
         if(!over)removeGlow()
         warningGlow?.originY=dp(store.overlayTop+store.overlaySize/2).toFloat()
         warningGlow?.reducedMotion=store.reducedMotion
-        warningGlow?.progress=store.allowanceProgress()
-        if(warningGlow!=null && store.allowanceProgress()>=LIMIT_CURTAIN_FRACTION)recordUsage(null,true)
-        companion?.apply { alpha=store.opacity; animated= !store.reducedMotion;talking=speaker?.speaking==true; activity=CompanionActivity.ACTIVE; expressive=store.expressions; progress=store.allowanceProgress() }
+        warningGlow?.progress=progress
+        if(warningGlow!=null && progress>=LIMIT_CURTAIN_FRACTION)recordUsage(null,true)
+        companion?.apply { alpha=store.opacity; animated= !store.reducedMotion;talking=speaker?.speaking==true; activity=CompanionActivity.ACTIVE; expressive=store.expressions; this.progress=progress }
         label?.alpha=store.counterOpacity
-        val count=if(store.remainingMode) (store.goal-store.total()).coerceAtLeast(0) else store.count(p.id)
+        val count=if(store.remainingMode) (goal-total).coerceAtLeast(0) else store.count(p.id)
         if(label?.text?.toString() != count.toString()) {
             label?.text=count.toString()
             if(!store.reducedMotion && android.animation.ValueAnimator.areAnimatorsEnabled()) {
@@ -317,7 +330,7 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
                 label?.animate()?.scaleX(1f)?.scaleY(1f)?.setDuration(140)?.start()
             }
         }
-        label?.setTextColor(if(store.total()>=store.goal) 0xFFFFB9CA.toInt() else 0xFFFFFFFF.toInt())
+        label?.setTextColor(if(total>=goal) 0xFFFFB9CA.toInt() else 0xFFFFFFFF.toInt())
         label?.contentDescription="${p.name}, $count ${if(store.remainingMode) "remaining today" else "estimated reels"}"
         contextLabel?.apply { visibility=if(store.showPlatform || stage!=LimitStage.NONE) View.VISIBLE else View.GONE; alpha=store.counterOpacity
             val next=when(stage){LimitStage.NEAR->"Near your daily limit";LimitStage.REACHED->"Daily limit reached";LimitStage.EXCEEDED->"Limit crossed · take a break";else->if(store.remainingMode) "left today" else p.name}
@@ -331,11 +344,15 @@ class ReelAccessibilityService : AccessibilityService(), SharedPreferences.OnSha
     private fun hide() {removeGlow();speaker?.stop(); overlay?.let { runCatching { getSystemService(WindowManager::class.java).removeView(it) } };overlay=null;companion=null;label=null;contextLabel=null }
     private fun dp(n: Int)=(n*resources.displayMetrics.density).toInt()
     override fun onSharedPreferenceChanged(p: SharedPreferences?, key: String?) {
-        if(key=="platforms")restrictEventPackages()
+        if(key=="platforms" || key==CustomPlatforms.KEY)restrictEventPackages()
         if(key=="pauseUntil")scheduleBreakFinish()
         if(key=="refreshUsageRequest") {recordUsage(null,true);scanGate.invalidate();cancelLimitScreen();usageClock.reset();active=null;hide()}
         if(key=="activityEpoch") {scanGate.invalidate();cancelLimitScreen();usageClock.reset();usagePending=null;tracker.clear();youtube.clear()}
-        if(key in setOf("running","platforms","consent","compatibility","pauseUntil")) { recordUsage(null,true); scanGate.invalidate();cancelLimitScreen();tracker.reset(); clearPager(); hide(); active=null }
+        if(key in setOf("running","platforms",CustomPlatforms.KEY,"consent","compatibility","pauseUntil")) { recordUsage(null,true); scanGate.invalidate();cancelLimitScreen();tracker.reset(); clearPager(); hide(); active=null }
+        if(key in setOf("running","platforms",CustomPlatforms.KEY,"consent","pauseUntil")) {
+            handler.removeCallbacks(tick)
+            if(heartbeatRequired())handler.post(tick)
+        }
         if(key in setOf("overlaySize","overlayTop")) hide()
         if(key=="goalReminders" && !store.goalReminders)speaker?.stop()
         // Counter writes originate in inspect(); rescanning for those writes creates a feedback loop.

@@ -4,20 +4,6 @@ import android.content.Context
 import java.time.LocalDate
 import com.rafi.antireelai.tracking.UsageDays
 
-enum class PlatformKind { SOCIAL, VIDEO }
-data class Platform(val id: String, val name: String, val subtitle: String, val symbol: String, val packages: Set<String>, val kind:PlatformKind=PlatformKind.VIDEO)
-val platforms = listOf(
-    Platform("instagram", "Instagram", "Reels", "◎", setOf("com.instagram.android", "com.instagram.lite"),PlatformKind.SOCIAL),
-    Platform("youtube", "YouTube", "Shorts", "▶", setOf("com.google.android.youtube")),
-    Platform("tiktok", "TikTok", "For You", "♪", setOf("com.zhiliaoapp.musically", "com.ss.android.ugc.trill", "com.zhiliaoapp.musically.go")),
-    Platform("facebook", "Facebook", "Reels · includes Lite", "f", setOf("com.facebook.katana", "com.facebook.lite"),PlatformKind.SOCIAL),
-    Platform("snapchat", "Snapchat", "Spotlight", "S", setOf("com.snapchat.android"),PlatformKind.SOCIAL),
-    Platform("likee", "Likee", "Short videos", "♥", setOf("video.like")),
-    Platform("snackvideo", "SnackVideo", "Short videos", "▷", setOf("com.kwai.bulldog")),
-    Platform("kwai", "Kwai", "Short videos", "K", setOf("com.kwai.video")),
-    Platform("moj", "Moj", "Reels", "M", setOf("in.mohalla.video")),
-    Platform("josh", "Josh", "Short videos", "J", setOf("com.eterno.shortvideos", "com.eterno.shortvideos.lite"))
-)
 class TrackerStore(context: Context) {
     internal val contextForSpeech=context.applicationContext
     private val appContext=context.applicationContext
@@ -44,6 +30,39 @@ class TrackerStore(context: Context) {
         get()=prefs.getBoolean("breakNotifications",true)
         set(value){prefs.edit().putBoolean("breakNotifications",value).apply();BreakReminders.showCurrent(appContext)}
     val prefs = context.getSharedPreferences("antireel", Context.MODE_PRIVATE)
+    private var catalogSource:String?=null
+    private var catalogValue:List<Platform> = emptyList()
+    val catalog:List<Platform> get() {
+        val source=prefs.getString(CustomPlatforms.KEY,"") ?: ""
+        if(source!=catalogSource || catalogValue.isEmpty()) {
+            catalogValue=CustomPlatforms.catalog(CustomPlatforms.decode(source));catalogSource=source
+        }
+        return catalogValue
+    }
+    val visibleSelected:Set<String> get()=catalog.filter{it.available && it.id in selected}.map{it.id}.toSet()
+    val trackedPlatforms:List<Platform> get()=catalog.filter{it.available && it.detectorId!=null && it.id in selected}
+    fun addCustomPlatform(packageName:String,name:String):Boolean {
+        if(!CustomPlatforms.validPackage(packageName) || packageName==CustomPlatforms.REMOVED_FACEBOOK_LITE)return false
+        val existing=catalog.find{packageName in it.packages && it.available}
+        if(existing!=null)return false
+        val records=CustomPlatforms.decode(prefs.getString(CustomPlatforms.KEY,"") ?: "").toMutableList()
+        val record=CustomPlatformRecord(packageName,name.filterNot{it.isISOControl()}.trim().take(80).ifBlank{packageName},true)
+        val index=records.indexOfFirst{it.packageName==packageName}
+        if(index<0)records.add(record) else records[index]=record
+        val id=CustomPlatforms.id(packageName)
+        prefs.edit().putString(CustomPlatforms.KEY,CustomPlatforms.encode(records))
+            .putStringSet("platforms",if(packageName==CustomPlatforms.YOUTUBE)selected+id else selected).apply()
+        PlatformCatalog.refresh(this)
+        return true
+    }
+    fun removeCustomPlatform(platform:Platform) {
+        if(!platform.isCustom)return
+        val records=CustomPlatforms.decode(prefs.getString(CustomPlatforms.KEY,"") ?: "").map {
+            if(it.packageName in platform.packages)it.copy(visible=false) else it
+        }
+        prefs.edit().putString(CustomPlatforms.KEY,CustomPlatforms.encode(records)).putStringSet("platforms",selected-platform.id).apply()
+        PlatformCatalog.refresh(this)
+    }
     var themeMode:String
         get()=prefs.getString("themeMode","system") ?: "system"
         set(value){prefs.edit().putString("themeMode",value).apply()}
@@ -57,7 +76,7 @@ class TrackerStore(context: Context) {
         get()=prefs.getBoolean("voiceGreeted",false)
         set(value){prefs.edit().putBoolean("voiceGreeted",value).apply()}
     fun usage(id:String,day:LocalDate=LocalDate.now())=prefs.getLong("usage:$day:$id",0)
-    fun totalUsage(day:LocalDate=LocalDate.now())=platforms.sumOf {usage(it.id,day)}
+    fun totalUsage(day:LocalDate=LocalDate.now())=catalog.sumOf {usage(it.id,day)}
     fun addUsage(id:String,from:Long,to:Long) {
         val edit=prefs.edit()
         UsageDays.split(from,to).forEach { (day,ms)->edit.putLong("usage:$day:$id",usage(id,day)+ms) }
@@ -136,7 +155,7 @@ class TrackerStore(context: Context) {
         get() = prefs.getFloat("opacity", .60f)
         set(value) { prefs.edit().putFloat("opacity", value).apply() }
     fun count(id: String, day: LocalDate = LocalDate.now()) = prefs.getInt("count:$day:$id", 0)
-    fun total(day: LocalDate = LocalDate.now()) = platforms.sumOf { count(it.id, day) }
+    fun total(day: LocalDate = LocalDate.now()) = catalog.sumOf { count(it.id, day).toLong() }.coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
     private var lastPrunedDay: LocalDate? = null
     fun increment(id: String) {
         val today = LocalDate.now()

@@ -11,12 +11,12 @@ internal object CompanionBodyCache {
     private val textures=ConcurrentHashMap<Boolean,Bitmap>()
     private val lock=Any()
     private val warming=AtomicBoolean(false)
-    private var renderer:BodyRenderer?=null
+    private var renderer:MisoBodyRenderer?=null
     fun warm() {
         if(warming.compareAndSet(false,true))Thread({body(false);body(true)},"Miso body warmup").apply{isDaemon=true;priority=Thread.NORM_PRIORITY-1}.start()
     }
     fun body(resting:Boolean):Bitmap= textures[resting] ?: synchronized(lock) {
-        textures[resting] ?: (renderer ?: BodyRenderer().also{renderer=it}).render(RESOLUTION,resting).also {
+        textures[resting] ?: (renderer ?: MisoBodyRenderer().also{renderer=it}).render(RESOLUTION,resting).also {
             textures[resting]=it
             if(textures.size==2)renderer=null
         }
@@ -24,10 +24,9 @@ internal object CompanionBodyCache {
 }
 
 /** No View, Context or Activity is retained; the warmup can run off the UI thread. */
-private class BodyRenderer {
+internal class MisoBodyRenderer(private val yaw:Float=-.06f) {
     private val paint=Paint(Paint.ANTI_ALIAS_FLAG)
     private val path=Path()
-    private val yaw=-.06f
     private val tilt=0f
     private val bob=0f
     private val comparator=Comparator<Triangle>{a,b->a.depth.compareTo(b.depth)}
@@ -53,8 +52,11 @@ private class BodyRenderer {
         sphere(.30f,-.63f,.095f,.085f,.20f,.045f,inner,2,6,10)
         sphere(-.25f,.58f,.10f,.17f,.10f,.20f,cream,0,6,12)
         sphere(.25f,.58f,.10f,.17f,.10f,.20f,cream,0,6,12)
-        sphere(-.33f,.18f,.28f,.145f,.19f,.15f,cream,3,8,14)
-        sphere(.33f,.18f,.28f,.145f,.19f,.15f,cream,4,8,14)
+        // The former forward, high arm caps intersected the cheeks after projection.
+        // Keep both complete rounded arms/paws, but tuck their upper caps beneath
+        // the face. The head supplies the natural rounded cheeks.
+        sphere(-.33f,.25f,.18f,.14f,.17f,.13f,cream,3,8,14)
+        sphere(.33f,.25f,.18f,.14f,.17f,.13f,cream,4,8,14)
         sphere(0f,-.10f,.02f,.53f,.45f,.35f,cream,0,22,44)
         // A tiny sculpted flower clip replaces the hat; the asymmetric ears stay visible.
         for(i in 0..4) {
@@ -62,8 +64,9 @@ private class BodyRenderer {
             sphere(-.37f+cos(angle).toFloat()*.062f,-.39f+sin(angle).toFloat()*.062f,.28f,.052f,.052f,.038f,0xFFFFF0CF.toInt(),5,5,8)
         }
         sphere(-.37f,-.39f,.325f,.035f,.035f,.025f,0xFFFFDCA4.toInt(),5,5,8)
-        sphere(-.23f,.015f,.28f,.13f,.10f,.09f,cream,0,6,12)
-        sphere(.23f,.015f,.28f,.13f,.10f,.09f,cream,0,6,12)
+        // The head already supplies the rounded cheek volume. These two former
+        // under-eye overlays intersected it and exposed dark folded facets.
+        // Facial blush is still painted by CompanionView; neither arm is removed.
     }
     private fun sphere(cx:Float,cy:Float,cz:Float,rx:Float,ry:Float,rz:Float,color:Int,part:Int,rings:Int,segments:Int) {
         val base=vertices.size

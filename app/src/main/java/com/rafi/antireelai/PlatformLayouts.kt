@@ -41,11 +41,11 @@ import androidx.compose.ui.unit.sp
                     PlatformBrand(p,Modifier.size(40.dp))
                     Column(Modifier.weight(1f),verticalArrangement=Arrangement.spacedBy(5.dp)) {
                         UiText(p.name,fontSize=15.sp,fontWeight=FontWeight.Medium,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
-                        UiText(if(isSelected && running && isInstalled)status(p.id) else if(isInstalled)"Installed" else p.subtitle,fontSize=11.sp,color=AppStyle.Muted,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
+                        UiText(if(p.isCustom)p.trackingLabel else if(isSelected && running && isInstalled)status(p.id) else if(isInstalled)"Installed" else p.subtitle,fontSize=11.sp,color=AppStyle.Muted,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                         if(isSelected)UiText("${counts.getOrElse(platforms.indexOf(p)){0}} reels today",fontSize=11.sp,color=AppStyle.Muted)
                     }
                     Row(Modifier.width(130.dp),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.spacedBy(8.dp)) {
-                        PlatformSelection(isSelected,p.name){onToggle(p,it)}
+                        PlatformSelection(isSelected,p.name,p.detectorId!=null){onToggle(p,it)}
                         TextButton(onClick={onOpen(p)},modifier=Modifier.width(70.dp).height(44.dp),shape=RoundedCornerShape(12.dp),contentPadding=PaddingValues(0.dp),colors=ButtonDefaults.textButtonColors(contentColor=AppStyle.Text)) {
                             UiText(if(isInstalled)"Open" else "Install",fontSize=12.sp,fontWeight=FontWeight.Medium,maxLines=1)
                         }
@@ -57,16 +57,17 @@ import androidx.compose.ui.unit.sp
 }
 
 /** A fixed-width, labelled-by-semantics selection control keeps every action aligned. */
-@Composable private fun PlatformSelection(selected:Boolean,name:String,onChange:(Boolean)->Unit) {
+@Composable private fun PlatformSelection(selected:Boolean,name:String,enabled:Boolean=true,onChange:(Boolean)->Unit) {
     val tint=if(selected)AppStyle.Teal else AppStyle.Muted
     Box(Modifier.size(52.dp,44.dp).clip(RoundedCornerShape(12.dp))
-        .toggleable(value=selected,interactionSource=remember{MutableInteractionSource()},indication=null,role=Role.Checkbox,onValueChange=onChange).semantics{contentDescription="Track $name"},contentAlignment=Alignment.Center) {
+        .toggleable(value=selected,enabled=enabled,interactionSource=remember{MutableInteractionSource()},indication=null,role=Role.Checkbox,onValueChange=onChange).semantics{contentDescription="Track $name"},contentAlignment=Alignment.Center) {
         AppGlyph(if(selected)20 else 25,tint,Modifier.size(21.dp))
     }
 }
 
 internal enum class PlatformFilter(val label:String) { ALL("All"), SELECTED("Selected"), INSTALLED("Installed"), SOCIAL("Social"), VIDEO("Video") }
 internal fun filterPlatforms(catalog:List<Platform>,query:String,filter:PlatformFilter,selected:Set<String>,installed:Set<String>):List<Platform> = catalog.filter {p->
+    p.available &&
     (query.isBlank() || "${p.name} ${p.subtitle}".contains(query.trim(),ignoreCase=true)) && when(filter) {
         PlatformFilter.ALL->true
         PlatformFilter.SELECTED->p.id in selected

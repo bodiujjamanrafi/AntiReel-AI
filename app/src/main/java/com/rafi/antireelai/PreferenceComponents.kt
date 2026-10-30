@@ -44,7 +44,11 @@ import kotlinx.coroutines.delay
         TextButton(onClick=onDismiss,modifier=Modifier.align(Alignment.CenterHorizontally)){UiText("Keep going")}
     }
 }
-internal fun parseDailyGoal(value:String):Int? = value.trim().toIntOrNull()?.takeIf{it>0}
+internal fun parseDailyGoal(value:String):Int? {
+    val text=value.trim()
+    if(text.isEmpty() || text.length>10 || text.any{Character.digit(it,10)<0})return null
+    return text.map{('0'.code+Character.digit(it,10)).toChar()}.joinToString("").toIntOrNull()?.takeIf{it>0}
+}
 @Composable internal fun GoalEditor(initial:Int,onDismiss:()->Unit,onSave:(Int)->Unit) {
     var input by remember(initial){mutableStateOf(initial.toString())}
     val goal=parseDailyGoal(input)
@@ -52,7 +56,7 @@ internal fun parseDailyGoal(value:String):Int? = value.trim().toIntOrNull()?.tak
         AppGlyph(5,AppStyle.Accent,Modifier.size(34.dp))
         UiText("Your daily boundary",fontSize=26.sp,fontWeight=FontWeight.Bold)
         UiText("Choose any positive whole number of reels across your selected apps.",fontSize=14.sp,lineHeight=21.sp,color=AppStyle.Muted)
-        OutlinedTextField(value=input,onValueChange={if(it.length<=10 && it.all{c->c in '0'..'9'})input=it},label={UiText("Reels per day")},keyboardOptions=KeyboardOptions(keyboardType=KeyboardType.Number),singleLine=true,isError=goal==null,modifier=Modifier.fillMaxWidth(),shape=RoundedCornerShape(16.dp),supportingText={if(goal==null)UiText("Enter a positive whole number.")})
+        DailyGoalField(input,{input=it})
         Row(horizontalArrangement=Arrangement.spacedBy(6.dp)){listOf(20,30,50,100).forEach{value->FilterChip(selected=goal==value,onClick={input=value.toString()},label={UiText("$value",fontSize=12.sp)})}}
         UiText("Miso speaks near your limit, at the limit, and again when you cross it. The red glow follows your progress.",fontSize=13.sp,lineHeight=20.sp,color=AppStyle.Muted)
         OutlinedButton(onClick={goal?.let(onSave)},enabled=goal!=null,modifier=Modifier.fillMaxWidth().height(52.dp),shape=RoundedCornerShape(15.dp)){UiText("Save daily goal",fontWeight=FontWeight.SemiBold)}

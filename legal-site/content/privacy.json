@@ -1,6 +1,6 @@
 {
-  "updated": "29 October 2026",
-  "app": "AntiReel AI",
+  "updated": "30 October 2026",
+  "app": "AntiReels AI",
   "contact": "hello@imrafi.com",
   "base_url": "https://legal.imrafi.bond",
   "slug": "privacy",
@@ -10,7 +10,7 @@
     {
       "title": "Who this policy covers",
       "paragraphs": [
-        "This policy covers the AntiReel AI Android application and its legal/support pages. The AntiReel AI developer can be contacted at hello@imrafi.com. AntiReel is a personal digital-wellbeing aid, not a disability accessibility tool or parental-control service."
+        "This policy covers the AntiReels AI Android application, previously named AntiReel AI, and its legal/support pages. The AntiReel AI developer can be contacted at hello@imrafi.com. AntiReel is a personal digital-wellbeing aid, not a disability accessibility tool or parental-control service."
       ]
     },
     {
@@ -24,6 +24,15 @@
       "paragraphs": [
         "Only after in-app consent and Android approval, while tracking is running, AntiReel reads visible accessibility labels/content, video metadata, page/scroll events and foreground app information in your selected supported platforms. Accessibility windows are inspected to locate the current foreground application; content snapshots are restricted to selected supported apps. Editable fields, passwords and hidden nodes are excluded from content inspection. These safeguards are not a guarantee about every third-party app’s accessibility labeling. Other visible text in a selected app may be encountered while checking for a short-video player; it is processed transiently and not saved as content or sent to the developer.",
         "This information is processed on your device to recognize short-video players, estimate newly viewed reels and time, reject recognized repeats/ads, and display Miso and the counter. At your chosen limit, the app requests media pause, returns to Home and displays a warning. You can pause Miso, decline setup, or disable accessibility in Android Settings. Home, Back and uninstall remain available."
+      ]
+    },
+    {
+      "title": "YouTube Shorts & Custom Platform Tracking",
+      "paragraphs": [
+        "YouTube Shorts tracking is experimental and may be incomplete or inaccurate. Android accessibility limitations, recycled interface elements, missing player labels and changes in an application’s interface can prevent reliable detection. Custom applications may not expose sufficient information to distinguish short videos from ordinary navigation. AntiReels AI does not guarantee accurate counting in every application. These are implementation limitations, not a statement that Google or YouTube endorses or officially restricts this app.",
+        "YouTube is not enabled as a built-in choice. Adding it through the custom platform picker requires a separate warning and affirmative confirmation. Applications without a validated detector are labeled unsupported and are not inspected for reel counting or video-screen time. Existing YouTube and removed custom-platform history is retained subject to the same local history rules as other activity.",
+        "When you open Add custom platform, Android PackageManager is queried for launchable applications visible through the Android launcher intent and the known YouTube package. App names and icons are shown to help you choose. No broad installed-app permission is requested. The unselected picker inventory is not saved, uploaded, sold or shared; confirmed custom package identifiers, display names and whether they remain in your platform list are stored locally. Removed entries retain this metadata to label historical statistics until all app data is cleared.",
+        "For explicitly enabled applications with a detector, accessibility information is used only for the disclosed on-device short-video tracking and limit functionality described above. Counts, durations and custom choices remain in app-private preferences. Screen text, captions and video identifiers are not saved or transmitted by the app. The same retention, deletion and third-party browser, speech and support-email practices in this policy apply."
       ]
     },
     {

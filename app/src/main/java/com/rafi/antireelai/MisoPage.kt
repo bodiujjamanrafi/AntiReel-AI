@@ -47,7 +47,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
         return
     }
     val actions:@Composable ()->Unit={
-        MisoAccessActions(connected,running,store.selected.isEmpty(),agreed,{agreed=it},{document=it},
+        MisoAccessActions(connected,running,store.trackedPlatforms.isEmpty(),agreed,{agreed=it},{document=it},
             {disclosure=true},onManage,onToggle,onPlatforms)
     }
     if(disclosure)AccessibilityDisclosure(onAccept={disclosure=false;store.prefs.edit().putInt("setupTermsVersion",2).apply();onAgree()},onDecline={disclosure=false})

@@ -2,6 +2,19 @@ package com.rafi.antireelai
 
 internal object UiCopyDetails {
  val bn=mapOf(
+ "Add custom platform" to "নিজের অ্যাপ যোগ করি",
+ "Search installed apps" to "ইনস্টল করা অ্যাপ খুঁজি",
+ "Experimental tracking" to "পরীক্ষামূলক গণনা",
+ "Unsupported tracking" to "গণনা সমর্থিত নয়",
+ "Built-in detector" to "অন্তর্ভুক্ত শনাক্তকারী",
+ "Remove custom platform" to "যোগ করা অ্যাপ সরাই",
+ "Add platform" to "অ্যাপ যোগ করি",
+ "Add anyway" to "তবুও যোগ করি",
+ "YouTube Shorts Tracking Limitation" to "ইউটিউব শর্টস গণনার সীমাবদ্ধতা",
+ "Enter your own limit" to "নিজের পছন্দের সীমা লেখো",
+ "Choose a launchable video-sharing app. Only your confirmed choice is saved on this device. Tracking support varies by app." to "ভিডিও শেয়ার করতে পারে এমন অ্যাপ বেছে নাও। শুধু নিশ্চিত করা বাছাইটিই ফোনে থাকে। সব অ্যাপে গণনা সমর্থিত নয়।",
+ "No eligible apps found. Apps must support video sharing and be visible to Android." to "উপযুক্ত অ্যাপ পাওয়া যায়নি। অ্যাপটি ভিডিও শেয়ার করতে পারা এবং অ্যান্ড্রয়েডে দৃশ্যমান হওয়া দরকার।",
+ YOUTUBE_LIMITATION to "ইউটিউবের ইন্টারফেস ও অ্যাক্সেসিবিলিটির আচরণের কারণে AntiReels AI এখন নির্ভুল শর্টস গণনার নিশ্চয়তা দিতে পারে না। কিছু শর্টস বাদ পড়তে পারে। ইউটিউব যোগ করতে পারো, তবে গণনা পরীক্ষামূলক থাকবে।",
  "A quick start" to "দ্রুত শুরু করি", "1 · Platforms selected" to "১ · প্ল্যাটফর্ম বেছে নেওয়া হয়েছে", "1 · Choose your platforms" to "১ · প্ল্যাটফর্ম বেছে নাও", "2 · Miso is connected" to "২ · মিসো সংযুক্ত", "2 · Connect Miso in Accessibility" to "২ · অ্যাক্সেসিবিলিটিতে মিসো সংযুক্ত করো", "Choose platforms" to "প্ল্যাটফর্ম বেছে নাও",
  "Language" to "ভাষা", "Your preferences stay on this phone." to "তোমার পছন্দ এই ফোনেই থাকে।", "Your daily plan" to "তোমার দৈনিক পরিকল্পনা", "Daily time" to "দৈনিক সময়", "Not set" to "ঠিক করা হয়নি", "Miso's voice" to "মিসোর কণ্ঠ", "Greetings and spoken reminders" to "স্বাগত বার্তা ও কণ্ঠে স্মরণ", "Edit my answers" to "আমার উত্তরগুলো বদলাই", "Review your goals and preferences" to "তোমার লক্ষ্য ও পছন্দগুলো আবার দেখো",
 

@@ -37,7 +37,10 @@ class LegalReaderTest {
             }
             for(theme in listOf(false,true))for(page in LegalDocument.entries) {
                 ui.runOnIdle{dark=theme;document=page}
-                ui.waitUntil(5000){ui.onAllNodesWithText("Updated 29 October 2026").fetchSemanticsNodes().isNotEmpty()}
+                val context=androidx.test.platform.app.InstrumentationRegistry.getInstrumentation().targetContext
+                val updated=org.json.JSONObject(context.assets.open(page.asset).bufferedReader().use{it.readText()}).getString("updated")
+                ui.waitUntil(5000){ui.onAllNodesWithText("Updated $updated").fetchSemanticsNodes().isNotEmpty()}
+                if(page==LegalDocument.PRIVACY)ui.onNodeWithText("YouTube Shorts & Custom Platform Tracking").assertExists()
                 ui.onNodeWithText(page.title).performScrollTo().assertIsDisplayed()
                 ui.onNodeWithText("Open public page").performScrollTo().assertIsDisplayed()
                 if(page==LegalDocument.SUPPORT)ui.onNodeWithText("Email support").performScrollTo().assertIsDisplayed()

@@ -1,0 +1,30 @@
+{
+  "version": "1.0.23",
+  "versionCode": 24,
+  "unit_tests": 173,
+  "unit_failures": 0,
+  "lint_errors": 0,
+  "lint_warnings": 90,
+  "tooling_tests": 17,
+  "last_completed_device_run": {
+    "tests": 17,
+    "passed": 17,
+    "failed": 0
+  },
+  "device_currently_connected": true,
+  "post_change_benchmark_verified": false,
+  "facebook_lite_live_counting_verified": false,
+  "legal_host_deployment_verified": false,
+  "tracking_algorithms_preserved": [
+    "instagram",
+    "tiktok",
+    "facebook",
+    "youtube (experimental opt-in)"
+  ],
+  "pending": [
+    "Uninterrupted after-change performance measurement",
+    "Live Facebook Lite counting validation"
+  ],
+  "report": "ADVANCED_FEATURES_1.0.23.md",
+  "performance_attempt": "Stopped safely because another app became foreground"
+}

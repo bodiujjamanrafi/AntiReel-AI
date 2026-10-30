@@ -1,4 +1,4 @@
 <resources>
-    <string name="app_name">AntiReel AI</string>
+    <string name="app_name">AntiReels AI</string>
 <string name="accessibility_description">AntiReel reads visible reel player labels and page changes in your selected platforms to estimate reel views and time, and show Miso. Processing stays on your device; screen text is not saved or uploaded. Password and editable fields are excluded. At your daily limit, AntiReel requests media pause, goes Home and shows a warning. It never clicks buttons, scrolls feeds or enables permissions for you. Pause in AntiReel or disable this service anytime.</string>
 </resources>

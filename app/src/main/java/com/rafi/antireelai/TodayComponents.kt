@@ -100,27 +100,15 @@ private val BrandCache=ConcurrentHashMap<String,ImageBitmap>()
 }
 /** Seven real local days; each cell opens the matching Activity breakdown. */
 @Composable internal fun RecentDays(history:List<ActivityDay>,onDay:(java.time.LocalDate)->Unit) {
-    val days=history.take(7).reversed()
-    val maximum=days.maxOfOrNull{it.totalReels}?.coerceAtLeast(1) ?:1
-    Column(verticalArrangement=Arrangement.spacedBy(14.dp)) {
-        ReferenceSectionTitle("Your week, at a glance")
-        Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically,horizontalArrangement=Arrangement.SpaceBetween) {
-            UiText("${days.sumOf{it.totalReels}} reels",fontSize=22.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
-            UiText(durationLabel(days.sumOf{it.totalMillis}),fontSize=15.sp,color=AppStyle.Muted)
+    val days=remember(history){recentActivityDays(history)}
+    ActivityPanel {
+        UiText("Your week, at a glance",fontSize=19.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text)
+        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(12.dp)) {
+            UiText("${days.sumOf{it.totalReels}} reels",modifier=Modifier.weight(1f).alignByBaseline(),
+                fontSize=24.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text,style=AnalyticsStyle.numbers)
+            UiText(durationLabel(days.sumOf{it.totalMillis}),modifier=Modifier.alignByBaseline(),fontSize=14.sp,color=AppStyle.Muted,style=AnalyticsStyle.numbers)
         }
-        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.spacedBy(7.dp)) {
-            days.forEach {day->
-                val today=day.date==java.time.LocalDate.now()
-                Column(Modifier.weight(1f).clip(RoundedCornerShape(12.dp)).clickable{onDay(day.date)}.semantics{contentDescription="${day.date}, ${day.totalReels} reels, ${durationLabel(day.totalMillis)}. View activity."}.padding(vertical=9.dp),horizontalAlignment=Alignment.CenterHorizontally,verticalArrangement=Arrangement.spacedBy(9.dp)) {
-                    UiText("${day.totalReels}",fontSize=12.sp,fontWeight=FontWeight.Medium,color=AppStyle.Text,maxLines=1)
-                    Box(Modifier.height(64.dp).fillMaxWidth(),contentAlignment=Alignment.BottomCenter) {
-                        Box(Modifier.width(17.dp).fillMaxHeight().background(AppStyle.Frame.copy(alpha=.15f),RoundedCornerShape(6.dp)))
-                        if(day.totalReels>0)Box(Modifier.width(17.dp).height((4+60f*day.totalReels/maximum).dp).background(if(today)AppStyle.Teal else AppStyle.Teal.copy(alpha=.4f),RoundedCornerShape(6.dp)))
-                    }
-                    UiText(day.date.format(java.time.format.DateTimeFormatter.ofPattern("EEEEE",java.util.Locale.forLanguageTag(LocalUiLanguage.current))),fontSize=12.sp,fontWeight=if(today)FontWeight.Bold else FontWeight.Normal,color=if(today)AppStyle.Teal else AppStyle.Muted)
-                }
-            }
-        }
+        AnalyticsBars(days,false,java.time.LocalDate.now(),onDay,showDate=false,plotHeight=68)
         if(days.isEmpty())UiText("Your recorded days will appear here.",fontSize=13.sp,color=AppStyle.Muted)
     }
 }

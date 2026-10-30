@@ -1,5 +1,5 @@
 {
-  "updated": "29 October 2026",
+  "updated": "30 October 2026",
   "app": "AntiReel AI",
   "contact": "hello@imrafi.com",
   "base_url": "https://legal.imrafi.bond",
@@ -17,7 +17,7 @@
     {
       "title": "Overlay and package visibility",
       "paragraphs": [
-        "Miso uses an accessibility overlay provided to the approved service. The app does not request the separate SYSTEM_ALERT_WINDOW / Display over other apps permission. Android package queries are limited to the supported social apps and speech engines to show installation/open actions; the app does not request QUERY_ALL_PACKAGES."
+        "Miso uses an accessibility overlay provided to the approved service. The app does not request the separate SYSTEM_ALERT_WINDOW / Display over other apps permission. Android package queries cover known supported apps and speech engines, plus launchable apps when you open the custom platform picker. Only confirmed custom names/package identifiers are retained locally. The app does not request QUERY_ALL_PACKAGES; unsupported custom apps are not monitored."
       ]
     },
     {

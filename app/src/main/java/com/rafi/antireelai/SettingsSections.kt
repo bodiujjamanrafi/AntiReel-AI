@@ -158,7 +158,7 @@ internal val settingsCategories=listOf(
                 }
                 SettingsSection.APP_INFO->{
                     val version=remember{runCatching{context.packageManager.getPackageInfo(context.packageName,0).versionName}.getOrNull() ?: ""}
-                    SettingsGroup {SettingsInset {UiText("AntiReel AI",fontSize=22.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text);SettingsText("Version $version")}}
+                    SettingsGroup {SettingsInset {UiText("AntiReels AI",fontSize=22.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Text);SettingsText("Version $version")}}
                     SettingsGroup("Android") {SettingsRow("Open AntiReel App info",17,"Permissions, notifications and system settings",onClick=onAppInfo)}
                 }
             }

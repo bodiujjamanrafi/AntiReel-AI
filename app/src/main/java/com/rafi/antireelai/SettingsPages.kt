@@ -81,7 +81,7 @@ import androidx.compose.ui.unit.sp
         SettingsRule()
         SettingsRow("Service",8,trailing={UiText(if(service)"Connected" else "Not connected",fontSize=14.sp,color=AppStyle.Text,modifier=Modifier.widthIn(max=110.dp))})
         SettingsRule()
-        SettingsRow("Selected apps",1,trailing={UiText("${store.selected.size}",fontSize=18.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Accent)})
+        SettingsRow("Selected apps",1,trailing={UiText("${store.visibleSelected.size}",fontSize=18.sp,fontWeight=FontWeight.SemiBold,color=AppStyle.Accent)})
     }
     SettingsGroup {
         SettingsFaq("Accessibility help",9){

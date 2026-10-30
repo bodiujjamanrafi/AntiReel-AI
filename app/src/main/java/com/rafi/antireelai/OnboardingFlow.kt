@@ -85,7 +85,12 @@ import org.json.JSONObject
     fun back(){speaker.stop();if(startReview){if(step==12 || review)onExit?.invoke() else {step=12;review=false;editingReview=false}} else if(review)review=false else step=previousOnboardingStep(step)}
     BackHandler(enabled=startReview || canGoBackInOnboarding(step) || review){if(startReview && step !in 0..12)onExit?.invoke() else back()}
     Surface(color=AppStyle.Background,contentColor=AppStyle.Text,modifier=Modifier.fillMaxSize()) {
-        Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().padding(22.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
+        if(step==-2) {
+            Box(Modifier.fillMaxSize().safeDrawingPadding().testTag("miso-preloader"),contentAlignment=Alignment.Center) {
+                AndroidView(factory={CompanionView(it)},update={it.animated=!store.reducedMotion;it.pose=MisoPose.HAPPY},
+                    modifier=Modifier.size(190.dp).graphicsLayer{scaleX=introScale.value;scaleY=scaleX})
+            }
+        } else Column(Modifier.fillMaxSize().safeDrawingPadding().imePadding().padding(22.dp),verticalArrangement=Arrangement.spacedBy(12.dp)) {
             Row(Modifier.fillMaxWidth(),verticalAlignment=Alignment.CenterVertically) {
                 TextButton(onClick={tap();back()},enabled=canGoBackInOnboarding(step) || review){Text(tr("Back","ফিরে যাই"))}
                 Spacer(Modifier.weight(1f))
@@ -122,6 +127,7 @@ import org.json.JSONObject
                 else if(step in 1..11) {
                     val q=onboardingQuestions.getValue(step)
                     q.options.forEachIndexed{i,label->
+                        if(step==2 && i in setOf(2,5))return@forEachIndexed
                         val selected=i in choice(step)
                         val multi=step==2
                         val choose={tap();val current=choice(step);answers=answers+(step to (if(multi)if(selected)current-i else current+i else listOf(i)).joinToString(","))}
@@ -159,7 +165,7 @@ import org.json.JSONObject
                 tap()
                 val missing=incomplete()
                 if(missing!=null){complete=false;step=missing;error=false}else {
-                    val profile=OnboardingProfile(name.trim(),language,minutes(),reels(),choice(2).mapNotNull{listOf("instagram","facebook","youtube","tiktok").getOrNull(it)}.toSet(),store.prefs.getString("reminderStyle","0")?.toIntOrNull()?.coerceIn(0,3) ?:0,muted,snapshot())
+                    val profile=OnboardingProfile(name.trim(),language,minutes(),reels(),choice(2).mapNotNull{listOf("instagram","facebook","youtube","tiktok",null,null).getOrNull(it)}.toSet(),store.prefs.getString("reminderStyle","0")?.toIntOrNull()?.coerceIn(0,3) ?:0,muted,snapshot())
                     busy=true;scope.launch{
                         val ok=runCatching{saveProfile(profile)}.getOrDefault(false)
                         busy=false

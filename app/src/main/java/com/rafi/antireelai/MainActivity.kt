@@ -64,7 +64,15 @@ private val Paper get()=AppStyle.Text
 class MainActivity: ComponentActivity() {
     private lateinit var store:TrackerStore
     override fun onCreate(savedInstanceState:Bundle?) {
-        super.onCreate(savedInstanceState);CompanionBodyCache.warm();enableEdgeToEdge(statusBarStyle=SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT),navigationBarStyle=SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT));store=TrackerStore(this)
+        super.onCreate(savedInstanceState);CompanionBodyCache.warm();enableEdgeToEdge(statusBarStyle=SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT),navigationBarStyle=SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT));store=TrackerStore(this);PlatformCatalog.refresh(store)
+        val decor=window.decorView
+        decor.viewTreeObserver.addOnPreDrawListener(object:android.view.ViewTreeObserver.OnPreDrawListener {
+            override fun onPreDraw():Boolean {
+                if(decor.rootWindowInsets==null){decor.requestApplyInsets();return false}
+                decor.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
         setContent {
             var mode by remember {mutableStateOf(store.themeMode)}
             var language by remember{mutableStateOf(store.prefs.getString("language","en") ?: "en")}
@@ -75,7 +83,7 @@ class MainActivity: ComponentActivity() {
             }
             val dark=when(mode){"dark"->true;"light"->false;else->isSystemInDarkTheme()}
             val colors=AppStyle.colorsFor(dark)
-            SideEffect {
+            LaunchedEffect(dark) {
                 AppStyle.dark=dark
                 window.setBackgroundDrawable(android.graphics.drawable.ColorDrawable(colors.background.toArgb()))
                 val bars=if(dark) SystemBarStyle.dark(android.graphics.Color.TRANSPARENT) else SystemBarStyle.light(android.graphics.Color.TRANSPARENT,android.graphics.Color.TRANSPARENT)
@@ -91,11 +99,11 @@ class MainActivity: ComponentActivity() {
     }
     private fun openMisoAccessibility(){
         if(!DeviceSettings.open(this,DeviceSettings.accessibilityIntent()))
-            android.widget.Toast.makeText(this,"Open Android Settings → Accessibility → AntiReel AI.",android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast.makeText(this,"Open Android Settings → Accessibility → AntiReels AI.",android.widget.Toast.LENGTH_LONG).show()
     }
     private fun openAppInfo(){
         if(!DeviceSettings.open(this,DeviceSettings.appInfoIntent(packageName)))
-            android.widget.Toast.makeText(this,"Open Android Settings → Apps → AntiReel AI → App info.",android.widget.Toast.LENGTH_LONG).show()
+            android.widget.Toast.makeText(this,"Open Android Settings → Apps → AntiReels AI → App info.",android.widget.Toast.LENGTH_LONG).show()
     }
     private fun connected()=getSystemService(AccessibilityManager::class.java).getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_ALL_MASK).any {
         it.resolveInfo.serviceInfo.let { service -> service.packageName==packageName && service.name==com.rafi.antireelai.tracking.ReelAccessibilityService::class.java.name }
@@ -121,18 +129,21 @@ class MainActivity: ComponentActivity() {
         var showWelcome by rememberSaveable { mutableStateOf(!store.welcomeSeen) }
         var focusMode by rememberSaveable {mutableStateOf(false)}
         var quickBreak by rememberSaveable {mutableStateOf(false)}
+        var customPicker by rememberSaveable {mutableStateOf(false)}
+        var platformManagerFromSettings by rememberSaveable {mutableStateOf(false)}
         var editGoal by rememberSaveable {mutableStateOf(false)}
         var erase by remember { mutableStateOf(false) }
         var installRevision by remember { mutableIntStateOf(0) }
         var platformQuery by rememberSaveable { mutableStateOf("") }
         var platformTools by rememberSaveable {mutableStateOf(false)}
         var platformFilter by rememberSaveable { mutableIntStateOf(0) }
-        val installed by produceState<Set<String>>(emptySet(),installRevision) {
-            value=withContext(Dispatchers.IO) { platforms.filter { p -> p.packages.any { pkg -> runCatching { packageManager.getApplicationInfo(pkg,0);true }.getOrDefault(false) } }.map { it.id }.toSet() }
+        val catalog=platforms
+        val installed by produceState<Set<String>>(emptySet(),installRevision,catalog) {
+            value=withContext(Dispatchers.IO) { catalog.filter { p -> p.available && p.packages.any { pkg -> runCatching { packageManager.getApplicationInfo(pkg,0);true }.getOrDefault(false) } }.map { it.id }.toSet() }
         }
         var tabHistory by remember {mutableStateOf(intArrayOf())}
         BackHandler(enabled=(tab==3 && settingsSection!=null) || tabHistory.isNotEmpty() || tab!=0) {
-            if(tab==1 && settingsPlatforms){settingsPlatforms=false;tab=3;if(tabHistory.lastOrNull()==3)tabHistory=tabHistory.dropLast(1).toIntArray()}
+            if(tab==1 && settingsPlatforms){settingsPlatforms=false;if(platformManagerFromSettings){tab=3;if(tabHistory.lastOrNull()==3)tabHistory=tabHistory.dropLast(1).toIntArray()}}
             else if(tab==3 && settingsSection!=null)settingsSection=null
             else if(tabHistory.isNotEmpty()){tab=tabHistory.last();tabHistory=tabHistory.dropLast(1).toIntArray()}
             else tab=0
@@ -225,7 +236,7 @@ class MainActivity: ComponentActivity() {
             }
         }
         @Suppress("UNUSED_VARIABLE") val refreshed=revision
-        val selected=remember(revision){store.selected}
+        val selected=remember(revision,catalog){store.visibleSelected}
         val total=remember(revision,clock){store.total()}
         val pauseUntil=store.pauseUntil
         LaunchedEffect(pauseUntil) {
@@ -264,14 +275,14 @@ class MainActivity: ComponentActivity() {
         LaunchedEffect(today) {if(LocalDate.parse(activityDay).isBefore(today.minusDays(29)) || LocalDate.parse(activityDay).isAfter(today)) activityDay=today.toString()}
         val historyDays=historyDaysForScreen(tab)
         val loadHistory=foreground && historyDays>0
-        val activityHistory by produceState(emptyList<ActivityDay>(),activityRevision,today,historyDays,loadHistory) {
+        val activityHistory by produceState(emptyList<ActivityDay>(),activityRevision,today,historyDays,loadHistory,catalog) {
             if(!loadHistory)return@produceState
             value=withContext(Dispatchers.Default) {
                 val values=store.prefs.all
-                (0 until historyDays).map {ActivityDay.read(today.minusDays(it.toLong()),values)}
+                (0 until historyDays).map {ActivityDay.read(today.minusDays(it.toLong()),values,catalog)}
             }
         }
-        val todayData=activityHistory.firstOrNull() ?: remember(today){ActivityDay(today,List(platforms.size){0},List(platforms.size){0L})}
+        val todayData=activityHistory.firstOrNull() ?: remember(today,catalog){ActivityDay(today,List(catalog.size){0},List(catalog.size){0L})}
         val scrollStates=AppDestination.entries.map { rememberLazyListState() }
         val settingsScrollStates=(0..SettingsSection.entries.size).map{rememberLazyListState()}
         val settingsPlatformsScroll=rememberLazyListState()
@@ -290,7 +301,7 @@ class MainActivity: ComponentActivity() {
                 Row(Modifier.fillMaxWidth().padding(horizontal=22.dp,vertical=12.dp),verticalAlignment=Alignment.CenterVertically) {
                     androidx.compose.foundation.Image(painter=androidx.compose.ui.res.painterResource(R.drawable.miso_brand_png),contentDescription="AntiReel · Miso bunny logo",modifier=Modifier.size(38.dp).clip(RoundedCornerShape(11.dp)))
                     Column(Modifier.weight(1f).padding(start=6.dp)) {
-                        UiText("antireel",fontSize=23.sp,fontWeight=FontWeight.Bold,letterSpacing=(-1).sp,color=Paper)
+                        UiText("AntiReels AI",fontSize=20.sp,fontWeight=FontWeight.Bold,letterSpacing=(-.5).sp,color=Paper,maxLines=1,overflow=androidx.compose.ui.text.style.TextOverflow.Ellipsis)
                     }
                     CompanionStatus(running,paused)
                     IconButton(onClick={tap();settingsSection=SettingsSection.ALERTS.name;change(3)},modifier=Modifier.size(36.dp)) {AppGlyph(13,Paper,Modifier.size(22.dp))}
@@ -312,21 +323,21 @@ class MainActivity: ComponentActivity() {
                                     HomeCompanionPanel(running,paused,speaker.ready,{tap();speaker.greet()},{if(running)toggleCompanion() else change(AppDestination.Miso.ordinal)})
                                 }
                                 if(paused)item("break-timer"){BreakTimer(pauseUntil){tap();store.pauseUntil=0}}
-                                item("selected-apps") {SelectedApps(platforms.filter{it.id in selected},todayData.reels,{change(1)}) {p->
+                                item("selected-apps") {SelectedApps(platforms.filter{it.id in selected},todayData.alignedReels(),{change(1)}) {p->
                                     tap()
                                     val intent=p.packages.firstNotNullOfOrNull{packageManager.getLaunchIntentForPackage(it)}
                                     if(intent!=null) startActivity(intent) else change(1)
                                 }}
                                 item("quick-actions") {
                                     Column(verticalArrangement=Arrangement.spacedBy(8.dp)) {
-                                        ReferenceSectionTitle("Quick access",tint=AppStyle.Violet)
+                                        ReferenceSectionTitle("Quick access",tint=AppStyle.Accent)
                                         Row(horizontalArrangement=Arrangement.spacedBy(12.dp)) {
-                                            ReferenceQuickAction("Focus mode",5,AppStyle.Teal,Modifier.weight(1f)){tap();focusMode=true}
-                                            ReferenceQuickAction("Break time",16,AppStyle.Coral,Modifier.weight(1f)){tap();if(paused)store.pauseUntil=0 else quickBreak=true}
+                                            ReferenceQuickAction("Focus mode",UtilityIcon.FOCUS,AppStyle.Teal,Modifier.weight(1f)){tap();focusMode=true}
+                                            ReferenceQuickAction("Break time",UtilityIcon.BREAK,AppStyle.Coral,Modifier.weight(1f)){tap();if(paused)store.pauseUntil=0 else quickBreak=true}
                                         }
                                         Row(horizontalArrangement=Arrangement.spacedBy(12.dp)) {
-                                            ReferenceQuickAction("Daily goal",5,AppStyle.Blue,Modifier.weight(1f)){tap();editGoal=true}
-                                            ReferenceQuickAction("Counter style",18,AppStyle.Accent,Modifier.weight(1f)){tap();settingsSection=SettingsSection.MISO.name;change(3)}
+                                            ReferenceQuickAction("Daily goal",UtilityIcon.GOAL,AppStyle.Blue,Modifier.weight(1f)){tap();editGoal=true}
+                                            ReferenceQuickAction("Counter style",UtilityIcon.COUNTER,AppStyle.Accent,Modifier.weight(1f)){tap();settingsSection=SettingsSection.MISO.name;change(3)}
                                         }
                                     }
                                 }
@@ -337,11 +348,11 @@ class MainActivity: ComponentActivity() {
                                 if(settingsPlatforms) {
                                     item("settings-platforms") {
                                         Box(Modifier.fillMaxWidth(),contentAlignment=Alignment.TopCenter) {
-                                            SettingsPlatforms(platformQuery,{platformQuery=it},PlatformFilter.entries.getOrElse(platformFilter){PlatformFilter.ALL},{tap();platformFilter=it.ordinal},selected,installed,todayData.reels,running,{statusLabel(store.status(it))},
-                                                {p,yes->tap();store.selected=if(yes)selected+p.id else selected-p.id},::openPlatform,
+                                            SettingsPlatforms(platformQuery,{platformQuery=it},PlatformFilter.entries.getOrElse(platformFilter){PlatformFilter.ALL},{tap();platformFilter=it.ordinal},selected,installed,todayData.alignedReels(),running,{statusLabel(store.status(it))},
+                                                {p,yes->tap();if(p.detectorId!=null)store.selected=if(yes)store.selected+p.id else store.selected-p.id},::openPlatform,
                                                 onBack={tap();onBackPressedDispatcher.onBackPressed()},
-                                                onSelectInstalled={tap();store.selected=selected+installed},onClear={tap();store.selected=emptySet()},
-                                                onSelectVisible={tap();store.selected=selected+filterPlatforms(platforms,platformQuery,PlatformFilter.entries.getOrElse(platformFilter){PlatformFilter.ALL},selected,installed).map{it.id}})
+                                                onSelectInstalled={tap();store.selected=store.selected+catalog.filter{it.available && it.detectorId!=null && it.id in installed}.map{it.id}},onClear={tap();store.selected=emptySet()},
+                                                onSelectVisible={tap();store.selected=store.selected+filterPlatforms(catalog,platformQuery,PlatformFilter.entries.getOrElse(platformFilter){PlatformFilter.ALL},selected,installed).filter{it.detectorId!=null}.map{it.id}},onAddCustom={tap();customPicker=true},onRemoveCustom={p->tap();store.removeCustomPlatform(p)})
                                         }
                                     }
                                 } else {
@@ -356,9 +367,10 @@ class MainActivity: ComponentActivity() {
                                             items(PlatformFilter.entries,key={it.name}){filter->FilterChip(selected=platformFilter==filter.ordinal,onClick={tap();platformFilter=filter.ordinal},label={UiText(filter.label,fontSize=11.sp)})}
                                         }
                                         PlatformSummary(selected.size,installed.size,{tap();platformFilter=1},{tap();platformFilter=2})
+                                        Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween){TextButton(onClick={tap();customPicker=true}){UiText("Add custom platform",fontSize=14.sp,color=AppStyle.Accent)};TextButton(onClick={tap();platformManagerFromSettings=false;settingsPlatforms=true}){UiText("Manage",fontSize=14.sp,color=AppStyle.Text)}}
                                         AnimatedVisibility(platformTools) {
                                             Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
-                                                TextButton(onClick={tap();store.selected=selected+installed},enabled=installed.isNotEmpty()){UiText("Select installed",fontSize=12.sp)}
+                                                TextButton(onClick={tap();store.selected=store.selected+catalog.filter{it.available && it.detectorId!=null && it.id in installed}.map{it.id}},enabled=installed.isNotEmpty()){UiText("Select installed",fontSize=12.sp)}
                                                 TextButton(onClick={tap();store.selected=emptySet()},enabled=selected.isNotEmpty()){UiText("Clear selection",fontSize=12.sp)}
                                             }
                                         }
@@ -369,30 +381,24 @@ class MainActivity: ComponentActivity() {
                                 val available=visible.filter{it.id !in selected}
                                 if(visible.isEmpty())item("empty-platforms"){Note("No matching platforms","Try a different search or switch to All.")}
                                 if(chosen.isNotEmpty())item("selected-platforms") {
-                                    PlatformGroup("Selected (${chosen.size})",chosen,selected,installed,todayData.reels,running,{statusLabel(store.status(it))},{platform,yes->tap();store.selected=if(yes)selected+platform.id else selected-platform.id},::openPlatform,{tap();store.selected=emptySet()},"Clear all")
+                                    PlatformGroup("Selected (${chosen.size})",chosen,selected,installed,todayData.alignedReels(),running,{statusLabel(store.status(it))},{platform,yes->tap();if(platform.detectorId!=null)store.selected=if(yes)store.selected+platform.id else store.selected-platform.id},::openPlatform,{tap();store.selected=emptySet()},"Clear all")
                                 }
                                 if(available.isNotEmpty())item("available-platforms") {
-                                    PlatformGroup("Available platforms",available,selected,installed,todayData.reels,running,{statusLabel(store.status(it))},{platform,yes->tap();store.selected=if(yes)selected+platform.id else selected-platform.id},::openPlatform,{tap();store.selected=selected+available.map{it.id}},"Select all")
+                                    PlatformGroup("Available platforms",available,selected,installed,todayData.alignedReels(),running,{statusLabel(store.status(it))},{platform,yes->tap();if(platform.detectorId!=null)store.selected=if(yes)store.selected+platform.id else store.selected-platform.id},::openPlatform,{tap();store.selected=store.selected+available.filter{it.detectorId!=null}.map{it.id}},"Select all")
                                 }
                                 }
                             }
                             2 -> {
                                 item("heading") {Column(verticalArrangement=Arrangement.spacedBy(6.dp)) {
-                                    UiText("Activity overview",fontSize=27.sp,fontWeight=FontWeight.SemiBold,letterSpacing=(-.6).sp)
+                                    UiText("Activity overview",fontSize=24.sp,fontWeight=FontWeight.SemiBold,letterSpacing=(-.6).sp)
                                 }}
                                 if(activityHistory.isNotEmpty()) {
-                                    item("trend") {UsageTrendChart(activityHistory,store.reducedMotion)}
+                                    item("trend") {UsageTrendChart(activityHistory,store.reducedMotion,LocalDate.parse(activityDay),{day->tap();activityDay=day.toString()})}
                                     item("week") {UsageWeekChart(activityHistory,LocalDate.parse(activityDay)){day->tap();activityDay=day.toString()}}
                                 }
                                 val day=LocalDate.parse(activityDay)
-                                val dayData=activityHistory.find{it.date==day} ?: todayData
-                                item("day-summary") {ActivityPanel {
-                                    UiText(day.format(java.time.format.DateTimeFormatter.ofPattern("EEEE, d MMM",java.util.Locale.forLanguageTag(LocalUiLanguage.current))),fontWeight=FontWeight.SemiBold)
-                                    Row(Modifier.fillMaxWidth(),horizontalArrangement=Arrangement.SpaceBetween) {
-                                        Column {UiText("${dayData.totalReels}",fontSize=30.sp,color=Seafoam,fontWeight=FontWeight.SemiBold);UiText("estimated reels",fontSize=11.sp,color=Muted)}
-                                        Column(horizontalAlignment=Alignment.End) {UiText(durationLabel(dayData.totalMillis),fontSize=30.sp,color=Seafoam,fontWeight=FontWeight.SemiBold);UiText("tracked video-screen time",fontSize=11.sp,color=Muted)}
-                                    }
-                                }}
+                                val dayData=activityDayOrEmpty(activityHistory,day)
+                                item("day-summary") {SelectedDaySummary(dayData)}
                                 item("share-chart") {UsageDonut(dayData)}
                                 
 
@@ -400,7 +406,7 @@ class MainActivity: ComponentActivity() {
                             3 -> {
                                 item("settings:${settingsSection ?: "index"}") {
                                     val section=SettingsSection.entries.find{it.name==settingsSection}
-                                    if(section==null)SettingsIndex(onOpen={tap();settingsSection=it},onPlatforms={tap();settingsPlatforms=true;change(1)})
+                                    if(section==null)SettingsIndex(onOpen={tap();settingsSection=it},onPlatforms={tap();platformManagerFromSettings=true;settingsPlatforms=true;change(1)})
                                     else Box(Modifier.fillMaxWidth(),contentAlignment=Alignment.TopCenter) {
                                         SettingsDetails(section,store,revision,enabled,speaker,this@MainActivity,
                                         onBack={tap();settingsSection=null},onConnect={change(AppDestination.Miso.ordinal)},
@@ -423,6 +429,7 @@ class MainActivity: ComponentActivity() {
             }
             }
         }
+        if(customPicker)CustomPlatformPicker(store){customPicker=false}
         if(focusMode)FocusModeDialog(running,paused,!enabled || !store.consent,selected.size,total,store.goal,
             onDismiss={focusMode=false},onToggle={focusMode=false;toggleCompanion()},onBreak={tap();focusMode=false;quickBreak=true})
         if(quickBreak) BreakPicker(onDismiss={quickBreak=false}){minutes->tap();speaker.stop();store.pauseUntil=System.currentTimeMillis()+minutes*60_000L;quickBreak=false;if(android.os.Build.VERSION.SDK_INT>=33 && store.breakNotifications && !BreakReminders.allowed(this@MainActivity))notificationPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)}
@@ -435,6 +442,7 @@ class MainActivity: ComponentActivity() {
 }
 
 private fun statusLabel(status:String)=when(status) {
+    "accessibility_unavailable"->"This app is not exposing readable Reel information"
     "tracking"->"Player recognized · counting"
     "limit_reached"->"Daily limit reached · counting stopped"
     "limit_covered"->"Daily boundary covered · take a break"

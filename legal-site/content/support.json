@@ -1,5 +1,5 @@
 {
-  "updated": "29 October 2026",
+  "updated": "30 October 2026",
   "app": "AntiReel AI",
   "contact": "hello@imrafi.com",
   "base_url": "https://legal.imrafi.bond",
@@ -22,6 +22,7 @@
     {
       "title": "YouTube Shorts and repeat detection",
       "paragraphs": [
+        "YouTube is not a built-in choice. Open Platforms → Manage → Add custom platform, select YouTube, read the limitation and choose Add anyway if you accept experimental tracking. Unknown custom apps remain unsupported and are not counted. Facebook Lite is no longer available for selection or tracking. Previously recorded Facebook Lite activity is retained; older Facebook totals may include past Lite usage and are not retroactively split.",
         "YouTube uses recycled player views and variable accessibility events. AntiReel pairs confirmed player transitions with settled video identity and rejects known repeats; ambiguous, hidden or too-brief metadata can still cause missed detections. Backward navigation to an unseen video may be ambiguous when direction is not exposed. Repeat history is bounded and temporary, not a permanent watched-video database."
       ]
     },
